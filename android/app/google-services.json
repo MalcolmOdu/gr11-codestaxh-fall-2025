@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "156138335674",
+    "project_id": "gr11-codestaxh-fall-2025",
+    "storage_bucket": "gr11-codestaxh-fall-2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:156138335674:android:b74e19b65143dad973c183",
+        "android_client_info": {
+          "package_name": "com.example.codestaxh"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChfxjywP4F-tYlzka4W4pEDBgmcSxaEBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
