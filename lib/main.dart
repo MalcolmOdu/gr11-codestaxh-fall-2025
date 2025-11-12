@@ -3,6 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'models/snippet.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:codestaxh/controllers/snippet_controller.dart';
+import 'package:codestaxh/controllers/snippet_notifier.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +17,7 @@ void main() async {
   Hive.registerAdapter(SnippetAdapter());
   await Hive.openBox<Snippet>('snippets');
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -33,32 +36,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class TestScreen extends StatefulWidget {
+class TestScreen extends ConsumerStatefulWidget {
   const TestScreen({super.key});
 
   @override
-  State<TestScreen> createState() => _TestScreenState();
+  ConsumerState<TestScreen> createState() => _TestScreenState();
 }
 
-class _TestScreenState extends State<TestScreen> {
-
-  int snippetCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkHive();
-  }
-
-  void _checkHive() {
-    final box = Hive.box<Snippet>('snippets');
-    setState(() {
-      snippetCount = box.length;
-    });
-  }
+class _TestScreenState extends ConsumerState<TestScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final snippets =  ref.watch(snippetProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('CodestaXh - Set up Complete'),
@@ -70,14 +61,33 @@ class _TestScreenState extends State<TestScreen> {
             const Icon(Icons.check_circle, size: 80, color: Colors.blue),
             const SizedBox(height: 16),
             const Text(
-              'Firebase + Hive Setup Complete',
+              'Riverpod State Management Ready',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Snippets in Hive: $snippetCount',
+              'Snippets in state: ${snippets.length}',
               style: const TextStyle(fontSize: 18),
-            )
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+                onPressed: () {
+                  final controller = SnippetController(ref);
+
+                  controller.addSnippet(
+                    title: 'Test Snippet ${snippets.length + 1}',
+                    code: 'print("Hello World!")',
+                    language: 'Python',
+                    tags: ['test', 'snippet'],
+                    author: 'Vincent Kennedy'
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Snippet Added')),
+                  );
+                },
+              icon: const Icon(Icons.add),
+              label: const Text('Add Snippet'),
+            ),
           ],
         ),
       ),
