@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'models/snippet.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,7 @@ void main() async {
   Hive.registerAdapter(SnippetAdapter());
   await Hive.openBox<Snippet>('snippets');
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -70,7 +71,7 @@ class _TestScreenState extends State<TestScreen> {
             const Icon(Icons.check_circle, size: 80, color: Colors.blue),
             const SizedBox(height: 16),
             const Text(
-              'Firebase + Hive Setup Complete',
+              'Riverpod State Management Ready',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
