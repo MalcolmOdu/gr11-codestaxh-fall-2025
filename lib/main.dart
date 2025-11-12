@@ -33,8 +33,29 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class TestScreen extends StatelessWidget {
+class TestScreen extends StatefulWidget {
   const TestScreen({super.key});
+
+  @override
+  State<TestScreen> createState() => _TestScreenState();
+}
+
+class _TestScreenState extends State<TestScreen> {
+
+  int snippetCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkHive();
+  }
+
+  void _checkHive() {
+    final box = Hive.box<Snippet>('snippets');
+    setState(() {
+      snippetCount = box.length;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,16 +63,21 @@ class TestScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('CodestaXh - Set up Complete'),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle, size: 80, color: Colors.blue),
-            SizedBox(height: 16),
-            Text(
+            const Icon(Icons.check_circle, size: 80, color: Colors.blue),
+            const SizedBox(height: 16),
+            const Text(
               'Firebase + Hive Setup Complete',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 8),
+            Text(
+              'Snippets in Hive: $snippetCount',
+              style: const TextStyle(fontSize: 18),
+            )
           ],
         ),
       ),
