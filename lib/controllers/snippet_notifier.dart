@@ -59,3 +59,4 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
     box.put(id, snippet);
   }
 }
+final snippetProvider = NotifierProvider<SnippetNotifier, List<Snippet>>(() {return SnippetNotifier();});

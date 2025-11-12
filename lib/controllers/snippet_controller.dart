@@ -65,5 +65,4 @@ class SnippetController {
   List<Snippet> getAllSnippets(){
     return ref.read(snippetProvider);
   }
-  final snippetProvider = NotifierProvider<SnippetNotifier, List<Snippet>>(() {return SnippetNotifier();});
 }
