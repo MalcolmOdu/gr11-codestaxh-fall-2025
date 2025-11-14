@@ -36,7 +36,7 @@ class SnippetController {
     ref.read(snippetProvider.notifier).remove(id);
   }
 
-  void uodateSnippet({
+  void updateSnippet({
     required String id,
     required String title,
     required String code,
