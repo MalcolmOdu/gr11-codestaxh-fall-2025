@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:codestaxh/controllers/snippet_controller.dart';
+import 'package:flutter_highlight/flutter_highlight.dart';
+import 'package:flutter_highlight/themes/github.dart';
 
 class SnippetEditorView extends ConsumerStatefulWidget {
   //if editing existing snippet, pass ID
@@ -101,23 +103,58 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
   }
 
   Widget _buildCodeEditor() {
-    return TextField(
-        controller: _codeController,
-        decoration: const InputDecoration(
-          labelText: 'Code',
-          hintText: 'Paste or Write your code here...',
-          border: OutlineInputBorder(),
-          alignLabelWithHint: true,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+          TextField(
+          controller: _codeController,
+          decoration: const InputDecoration(
+            labelText: 'Code',
+            hintText: 'Paste or Write your code here...',
+            border: OutlineInputBorder(),
+            alignLabelWithHint: true,
+          ),
+          maxLines: 15,
+          style: const TextStyle(
+            fontFamily: 'monospace',
+            fontSize: 14,
+          ),
+          //for autodetect
+          onChanged: (value) {
+            setState(() {});
+          },
         ),
-      maxLines: 15,
-      style: const TextStyle(
-        fontFamily: 'monospace',
-        fontSize: 14,
-      ),
-      //for autodetect
-      onChanged: (value) {
 
-      },
+        //Preview with syntax highlighting
+        if (_codeController.text.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Text(
+            'Preview',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.all(8),
+            child: HighlightView(
+              _codeController.text,
+              language: _selectedLanguage.toLowerCase(),
+              theme: githubTheme,
+              padding: const EdgeInsets.all(8),
+              textStyle: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
   Widget _buildLanguageSelector(){
@@ -232,7 +269,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
     else if(code.contains('function') || code.contains('const') || code.contains('let')) {
       detectedLanguage = 'JavaScript';
     }
-    else if(code.contains('class') && code.contains('void ') && code.contains('{')){
+    else if(code.contains('class') && code.contains('void ') && code.contains('{') || code.contains('System.out.print ')){
       detectedLanguage = 'Java';
     }
     else if(code.contains('widget ') || code.contains('stateless') || code.contains('stateful')) {
