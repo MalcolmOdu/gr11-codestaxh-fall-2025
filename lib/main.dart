@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
@@ -16,9 +17,11 @@ void main() async {
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
 
 
-  await Hive.initFlutter();
-  Hive.registerAdapter(SnippetAdapter());
-  await Hive.openBox<Snippet>('snippets');
+  if(!kIsWeb){
+    await Hive.initFlutter();
+    Hive.registerAdapter(SnippetAdapter());
+    await Hive.openBox<Snippet>('snippets');
+  }
 
   runApp(const ProviderScope(child: MyApp()));
 }

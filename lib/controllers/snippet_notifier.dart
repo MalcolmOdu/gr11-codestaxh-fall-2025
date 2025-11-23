@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:codestaxh/models/snippet.dart';
@@ -11,8 +12,13 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
 
   @override
   List<Snippet> build() {   //where we load initial data from hive
-    final box = Hive.box<Snippet>('snippets');
-    final initialSnippets = box.values.toList();
+    List<Snippet> initialSnippets = [];
+
+    if (!kIsWeb){
+      //mobile only loads from hive cache
+      final box = Hive.box<Snippet>('snippets');
+      initialSnippets = box.values.toList();
+    }
 
     _listenToFirestoreChange();
 
@@ -22,13 +28,15 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
   void _listenToFirestoreChange() {
     _snippetsCollection.snapshots().listen((snapshot) {
       final snippets = <Snippet>[];
-      final box = Hive.box<Snippet>('snippets');
 
       for (var doc in snapshot.docs) {
         try {
           final snippet = Snippet.fromFirestore(doc);
           snippets.add(snippet);
-          box.put(snippet.id, snippet);
+          if (!kIsWeb) {
+            final box = Hive.box<Snippet>('snippets');
+            box.put(snippet.id, snippet);
+          }
         } catch (e) {
           print('Error parsing snippet: ${doc.id}: $e');
         }
@@ -42,9 +50,11 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
   Future<void> add(Snippet snippet) async {
     state = [...state, snippet];
 
-    final box = Hive.box<Snippet>('snippets');
-    await box.put(snippet.id, snippet);
+    if (!kIsWeb) {
+      final box = Hive.box<Snippet>('snippets');
+      await box.put(snippet.id, snippet);
 
+    }
     try {
       await _snippetsCollection.doc(snippet.id).set(snippet.toMap());
       print('Snippet ${snippet.id} synced to Firestore');
@@ -56,8 +66,10 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
   Future<void> remove(String id) async {
     state = state.where((snippet) => snippet.id != id).toList();
 
-    final box = Hive.box<Snippet>('snippets');
-    await box.delete(id);
+   if (!kIsWeb) {
+     final box = Hive.box<Snippet>('snippets');
+     await box.delete(id);
+   }
 
     try {
       await _snippetsCollection.doc(id).delete();
@@ -76,8 +88,10 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
       return snippet;
     }).toList();
 
-    final box = Hive.box<Snippet>('snippets');
-    await box.put(id, updatedSnippet);
+    if (!kIsWeb) {
+      final box = Hive.box<Snippet>('snippets');
+      await box.put(id, updatedSnippet);
+    }
 
     try {
       await _snippetsCollection.doc(id).update(updatedSnippet.toMap());
