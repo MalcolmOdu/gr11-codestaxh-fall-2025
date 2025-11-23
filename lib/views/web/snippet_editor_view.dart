@@ -40,7 +40,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
     'Swift',
     'TypeScript',
   ];
-  final List<String> _tags =[];
+  final List<String> _tags = [];
   bool _isSaving = false; //loading state for save button
 
   @override
@@ -56,7 +56,10 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.id == null ? 'New Snippet' : 'Edit Snippet'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme
+            .of(context)
+            .colorScheme
+            .inversePrimary,
       ),
       body: Center(
         child: ConstrainedBox(
@@ -106,7 +109,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-          TextField(
+        TextField(
           controller: _codeController,
           decoration: const InputDecoration(
             labelText: 'Code',
@@ -157,39 +160,41 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
       ],
     );
   }
-  Widget _buildLanguageSelector(){
+
+  Widget _buildLanguageSelector() {
     return Row(
-      children: [
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            initialValue: _selectedLanguage,
-            decoration: const InputDecoration(
-              labelText: 'Language',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.code),
+        children: [
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              initialValue: _selectedLanguage,
+              decoration: const InputDecoration(
+                labelText: 'Language',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.code),
+              ),
+              items: _languages.map((language) {
+                return DropdownMenuItem<String>(
+                  value: language,
+                  child: Text(language),);
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedLanguage = value!;
+                });
+              },
             ),
-            items: _languages.map((language) {
-              return DropdownMenuItem<String>(
-                value: language,
-                child: Text(language),);}).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedLanguage = value!;
-              });
-            },
           ),
-        ),
-        const SizedBox(width: 16),
-        ElevatedButton.icon(
-          onPressed: _autoDetectLanguage,
-          icon: const Icon(Icons.auto_fix_high),
-          label: const Text('Auto Detect'),
-        )
-      ]
+          const SizedBox(width: 16),
+          ElevatedButton.icon(
+            onPressed: _autoDetectLanguage,
+            icon: const Icon(Icons.auto_fix_high),
+            label: const Text('Auto Detect'),
+          )
+        ]
     );
   }
 
-  Widget _buildTagsSelector(){
+  Widget _buildTagsSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -206,15 +211,16 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            ..._tags.map((tag) => Chip(
-              label: Text(tag),
-              deleteIcon: const Icon(Icons.close, size: 16),
-              onDeleted: () {
-                setState(() {
-                  _tags.remove(tag);
-                });
-              },
-            )),
+            ..._tags.map((tag) =>
+                Chip(
+                  label: Text(tag),
+                  deleteIcon: const Icon(Icons.close, size: 16),
+                  onDeleted: () {
+                    setState(() {
+                      _tags.remove(tag);
+                    });
+                  },
+                )),
 
             //Button to add tag
             ActionChip(
@@ -243,11 +249,12 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
         ElevatedButton.icon(
           onPressed: _isSaving ? null : _saveSnippet,
           icon: _isSaving ?
-              const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              )
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+                strokeWidth: 2, color: Colors.white),
+          )
               : const Icon(Icons.save),
           label: const Text('Save'),
           style: ElevatedButton.styleFrom(
@@ -263,52 +270,64 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
 
     String detectedLanguage = 'Python';
 
-    if(code.contains('def') || code.contains('import') || code.contains('print(')) {
+    if (code.contains('def') || code.contains('import') ||
+        code.contains('print(')) {
       detectedLanguage = 'Python';
     }
-    else if(code.contains('function') || code.contains('const') || code.contains('let')) {
+    else if (code.contains('function') || code.contains('const') ||
+        code.contains('let')) {
       detectedLanguage = 'JavaScript';
     }
-    else if(code.contains('class') && code.contains('void ') && code.contains('{') || code.contains('System.out.print ')){
+    else if (code.contains('class') && code.contains('void ') &&
+        code.contains('{') || code.contains('System.out.print ')) {
       detectedLanguage = 'Java';
     }
-    else if(code.contains('widget ') || code.contains('stateless') || code.contains('stateful')) {
+    else if (code.contains('widget ') || code.contains('stateless') ||
+        code.contains('stateful')) {
       detectedLanguage = 'Dart';
     }
-    else if(code.contains('<?php')){
+    else if (code.contains('<?php')) {
       detectedLanguage = 'PHP';
     }
-    else if(code.contains('select ') || code.contains('from ') || code.contains('where ')) {
+    else if (code.contains('select ') || code.contains('from ') ||
+        code.contains('where ')) {
       detectedLanguage = 'SQL';
     }
-    else if(code.contains('<html') || code.contains('<div')) {
+    else if (code.contains('<html') || code.contains('<div')) {
       detectedLanguage = 'HTML';
     }
-    else if(code.contains('fn') || code.contains('impl ')){
+    else if (code.contains('fn') || code.contains('impl ')) {
       detectedLanguage = 'Rust';
     }
-    else if(code.contains('func') && code.contains('package ')){
+    else if (code.contains('func') && code.contains('package ')) {
       detectedLanguage = 'Go';
     }
-    else if(code.contains('fun ') && code.contains('val ') || code.contains('var ')) {
+    else if (code.contains('fun ') && code.contains('val ') ||
+        code.contains('var ')) {
       detectedLanguage = 'Kotlin';
     }
-    else if(code.contains('#include') || code.contains('std::') || code.contains('cout')){
+    else if (code.contains('#include') || code.contains('std::') ||
+        code.contains('cout')) {
       detectedLanguage = 'C++';
     }
-    else if(code.contains('using namespace') || code.contains('using system') && code.contains('public class')){
+    else if (code.contains('using namespace') ||
+        code.contains('using system') && code.contains('public class')) {
       detectedLanguage = 'C#';
     }
-    else if(code.contains('import foundation') || code.contains('import UIKit')){
+    else
+    if (code.contains('import foundation') || code.contains('import UIKit')) {
       detectedLanguage = 'Swift';
     }
-    else if(code.contains('def ') && code.contains('end') && code.contains('class')){
+    else if (code.contains('def ') && code.contains('end') &&
+        code.contains('class')) {
       detectedLanguage = 'Ruby';
     }
-    else if(code.contains('<style>') || code.contains('</style>')){
+    else if (code.contains('<style>') || code.contains('</style>')) {
       detectedLanguage = 'CSS';
     }
-    else if(code.contains(': string') || code.contains(': number') || code.contains(': boolean') && code.contains('let ') || code.contains('const ')){
+    else if (code.contains(': string') || code.contains(': number') ||
+        code.contains(': boolean') && code.contains('let ') ||
+        code.contains('const ')) {
       detectedLanguage = 'TypeScript';
     }
     setState(() {
@@ -351,7 +370,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
               },
               child: const Text('Add'),
             ),
-          ] ,
+          ],
         );
       },
     );
@@ -367,51 +386,55 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
     }
   }
 
-  void _saveSnippet() {
+
+  Future<void> _saveSnippet() async {
     final title = _titleController.text.trim();
     final code = _codeController.text.trim();
 
     if (title.isEmpty || code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Title and code cannot be empty'),
-        ),
+        const SnackBar(content: Text('Please enter a title and code.')),
       );
       return;
     }
 
+    // Set loading state
     setState(() {
       _isSaving = true;
     });
 
+    //snippet using SnippetController
     final controller = SnippetController(ref);
-    try{
-      controller.addSnippet(
+
+    try {
+      await controller.addSnippet(
         title: title,
         code: code,
         language: _selectedLanguage,
         tags: _tags,
-        author: 'User',
+        author: 'Test User',
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Snippet saved successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      if (mounted) { // Check if widget still exists
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Snippet saved and synced to cloud! ☁️'),
+            backgroundColor: Colors.green,
+          ),
+        );
 
-      Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error saving snippet: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      setState(() {
-        _isSaving = false;
-      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving snippet: $e')),
+        );
+
+        setState(() {
+          _isSaving = false;
+        });
+      }
     }
   }
 }

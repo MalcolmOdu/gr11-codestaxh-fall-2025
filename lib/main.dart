@@ -5,12 +5,16 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'models/snippet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'views/web/snippet_editor_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
+
 
   await Hive.initFlutter();
   Hive.registerAdapter(SnippetAdapter());
