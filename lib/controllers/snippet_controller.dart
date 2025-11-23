@@ -1,20 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import 'package:codestaxh/models/snippet.dart';
+import '../models/snippet.dart';
 import 'snippet_notifier.dart';
 
 class SnippetController {
- final WidgetRef ref;
+  final WidgetRef ref;
 
   SnippetController(this.ref);
 
-  void addSnippet({
+  Future<void> addSnippet({
     required String title,
     required String code,
     required String language,
     required List<String> tags,
     required String author,
-  }){
+  }) async {
     const uuid = Uuid();
     final id = uuid.v4();
 
@@ -29,22 +29,24 @@ class SnippetController {
       dateAdded: DateTime.now(),
     );
 
-    ref.read(snippetProvider.notifier).add(snippet);
+    await ref.read(snippetProvider.notifier).add(snippet);
   }
 
-  void removeSnippet(String id){
-    ref.read(snippetProvider.notifier).remove(id);
+
+  Future<void> removeSnippet(String id) async {
+    await ref.read(snippetProvider.notifier).remove(id);
   }
 
-  void uodateSnippet({
+  Future<void> updateSnippet({
     required String id,
     required String title,
     required String code,
     required String language,
     required List<String> tags,
-  }){
+  }) async {
     final snippets = ref.read(snippetProvider);
-    final oldSnippet = snippets.firstWhere((snippet) => snippet.id == id);
+    final oldSnippet = snippets.firstWhere((s) => s.id == id);
+
     final updatedSnippet = Snippet(
       id: id,
       title: title,
@@ -55,14 +57,16 @@ class SnippetController {
       upvote: oldSnippet.upvote,
       dateAdded: oldSnippet.dateAdded,
     );
-    ref.read(snippetProvider.notifier).update(id, updatedSnippet);
+
+    await ref.read(snippetProvider.notifier).update(id, updatedSnippet);
   }
 
-  void upvoteSnippet(String id){
-    ref.read(snippetProvider.notifier).upvote(id);
+
+  Future<void> upvoteSnippet(String id) async {
+    await ref.read(snippetProvider.notifier).upvote(id);
   }
 
-  List<Snippet> getAllSnippets(){
+  List<Snippet> getAllSnippets() {
     return ref.read(snippetProvider);
   }
 }

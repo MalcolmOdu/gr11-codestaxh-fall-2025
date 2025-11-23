@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'models/snippet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'views/web/snippet_editor_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,9 +14,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await Hive.initFlutter();
-  Hive.registerAdapter(SnippetAdapter());
-  await Hive.openBox<Snippet>('snippets');
+  FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
+
+
+  if(!kIsWeb){
+    await Hive.initFlutter();
+    Hive.registerAdapter(SnippetAdapter());
+    await Hive.openBox<Snippet>('snippets');
+  }
 
   runApp(const ProviderScope(child: MyApp()));
 }
