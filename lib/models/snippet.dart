@@ -1,7 +1,8 @@
 import 'package:hive_ce/hive.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 part 'snippet.g.dart';
 
-@HiveType(typeId: 1) //Unigue ID for this model
+@HiveType(typeId: 1) //Unique ID for this model
 class Snippet extends HiveObject {
   @HiveField(0)
   final String id;
@@ -38,4 +39,36 @@ class Snippet extends HiveObject {
     required this.dateAdded,
   });
 
+  //Snippet to Map for Firestore
+  Map<String, dynamic> toMap() {
+    return{
+      'id': id,
+      'title': title,
+      'code': code,
+      'language': language,
+      'tags': tags,
+      'author': author,
+      'upvote': upvote,
+      'dateAdded': Timestamp.fromDate(dateAdded), //Firestore needs Timestamp
+    };
+  }
+
+  //Map to Snippet from Firestore
+  factory Snippet.fromMap(Map<String, dynamic> map) {
+    return Snippet(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      code: map['code'] as String,
+      language: map['language'] as String,
+      tags: List<String>.from(map['tags'] as List),
+      author: map['author'] as String,
+      upvote: map['upvote'] as int,
+      dateAdded: (map['dateAdded'] as Timestamp).toDate(),
+    );
+  }
+
+  factory Snippet.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Snippet.fromMap(data);
+  }
 }
