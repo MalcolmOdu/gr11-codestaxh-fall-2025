@@ -5,6 +5,7 @@ import '../controllers/snippet_controller.dart';
 import 'package:codestaxh/controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
+import 'package:codestaxh/views/detailed_view.dart';
 
 
 class SnippetListView extends ConsumerWidget {
@@ -14,6 +15,8 @@ class SnippetListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = SnippetController(ref);
     final snippets = ref.watch(snippetProvider);
+
+    
 
     return Scaffold(
       body: SafeArea(
@@ -80,8 +83,14 @@ class SnippetListView extends ConsumerWidget {
                         final preview =
                             s.code.split('\n').take(3).join('\n');
 
-                        return GestureDetector(
-                          onTap: () {},
+                        return InkWell(
+                          onTap: ()=> Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailedView(id: s.id),
+                            ),
+                          ),
                           child: Card(
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 8),
