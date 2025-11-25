@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/snippet_controller.dart';
-import 'package:codestaxh/controllers/snippet_notifier.dart';
+import '../controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import 'package:codestaxh/views/detailed_view.dart';
@@ -14,60 +14,96 @@ class SnippetListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = SnippetController(ref);
-    final snippets = ref.watch(snippetProvider);
+    final filteredSnippets = ref.watch(filteredSnippetsProvider);
+     
 
     
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ---------------- FILTER / SEARCH SECTION ----------------
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: const Color.fromARGB(255, 15, 11, 234),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // --- SEARCH TEXTFIELD ---
-                  TextField(
+      appBar: AppBar(
+        title: const Text("Snippets"),
+        toolbarHeight: 140,
+        backgroundColor: Colors.blue,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(80),
+          child: Padding(
+            
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // SEARCH BAR
+                SizedBox(
+                  width: double.infinity,
+                  
+                  child: TextField(
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       hintText: "Search snippets...",
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding:
-                          const EdgeInsets.symmetric(vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
                     ),
+                    onChanged: (value){
+                      ref.read(snippetSearchProvider.notifier).state = value;
+                    }
                   ),
+                ),
 
-                  const SizedBox(height: 12),
+          const SizedBox(height: 12),
 
-                  // --- TAG FILTER ROW ---
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: const [
-                      Chip(label: Text("Python")),
-                      Chip(label: Text("Java")),
-                      Chip(label: Text("Dart")),
-                      Chip(label: Text("C++")),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          // TAG FILTER, add filter implementation here 
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final lang in ["Python", "Java", "Dart", "C++"])
+                Consumer(
+                  builder: (context, ref, _) {
+                    final selected = ref.watch(snippetTagFilterProvider).contains(lang);
+
+                    return ChoiceChip(
+                      label: Text(lang),
+                      selected: selected,
+                      selectedColor: Colors.blue.shade200,
+                      onSelected: (_) {
+                        final tags = ref.read(snippetTagFilterProvider.notifier).state;
+                        print(tags);
+                        final newSet = Set<String>.from(tags);
+
+                        if (selected) {
+                          newSet.remove(lang);
+                        } else {
+                          newSet.add(lang);
+                        }
+
+                        ref.read(snippetTagFilterProvider.notifier).state = newSet;
+                      },
+                    );
+                  },
+                ),
+            ],
+          ),
+
+        ],
+      ),
+    ),
+  ),
+),
+
+     
+      body: Center(
+        child: Column(
+          children: [
 
             const SizedBox(height: 12),
 
             // ---------------- SNIPPETS LIST ----------------
             Expanded(
-              child: snippets.isEmpty
+              child: filteredSnippets.isEmpty
                   ? const Center(
                       child: Text(
                         'No snippets yet. Create one on the web app.',
@@ -75,9 +111,9 @@ class SnippetListView extends ConsumerWidget {
                       ),
                     )
                   : ListView.builder(
-                      itemCount: snippets.length,
+                      itemCount: filteredSnippets.length,
                       itemBuilder: (context, i) {
-                        final s = snippets[i];
+                        final s = filteredSnippets[i];
 
                         // 3-line code preview
                         final preview =
@@ -191,9 +227,9 @@ class SnippetListView extends ConsumerWidget {
         onPressed: () {
           controller.addSnippet(
             title: 'New Snippet',
-            code: 'print("Hello, World!")',
-            language: 'Python',
-            tags: ["Python", "Example"],
+            code: 'print("test, World!")',
+            language: 'java',
+            tags: ["Python", "Java"],
             author: 'User',
           );
         },
