@@ -28,6 +28,9 @@ class Snippet extends HiveObject {
   @HiveField(7)
   final DateTime dateAdded;
 
+  @HiveField(8)
+  final String? teamId;
+
   Snippet({
     required this.id,
     required this.title,
@@ -37,6 +40,7 @@ class Snippet extends HiveObject {
     required this.author,
     required this.upvote,
     required this.dateAdded,
+    this.teamId,
   });
 
   //Snippet to Map for Firestore
@@ -50,6 +54,7 @@ class Snippet extends HiveObject {
       'author': author,
       'upvote': upvote,
       'dateAdded': Timestamp.fromDate(dateAdded), //Firestore needs Timestamp
+      'teamId': teamId,
     };
   }
 
@@ -64,6 +69,7 @@ class Snippet extends HiveObject {
       author: map['author'] as String,
       upvote: map['upvote'] as int,
       dateAdded: (map['dateAdded'] as Timestamp).toDate(),
+      teamId: map['teamId'] as String?,
     );
   }
 
