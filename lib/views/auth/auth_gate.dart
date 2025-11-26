@@ -4,6 +4,9 @@ import '../../providers/auth_provider.dart';
 import '../../widgets/loading_widgets.dart';
 import 'login_view.dart';
 import '../../views/web/snippet_editor_view.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import '../../views/snippet_view.dart';
+
 
 // this widget shows login screen or main app based on auth state
 class AuthGate extends ConsumerWidget {
@@ -158,8 +161,12 @@ class AuthGate extends ConsumerWidget {
           return const LoginView();
         }
 
-
-        return const SnippetEditorView();  //will be either web dashboard or mobile list view, to change when i get mobile ui
+        if (kIsWeb){
+          return const SnippetEditorView();
+        }
+        else{
+          return const SnippetListView();
+        }
       },
     );
   }

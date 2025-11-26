@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:codestaxh/models/snippet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive_ce/hive.dart';
+import 'package:hive/hive.dart';
 
 //This notifier manages the list of snippets
 class SnippetNotifier extends Notifier<List<Snippet>> {

@@ -21,7 +21,7 @@ class SnippetListView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Snippets"),
+        title: const Text("Stashed Snippets!"),
         toolbarHeight: 140,
         backgroundColor: Colors.blue,
         bottom: PreferredSize(
@@ -40,7 +40,7 @@ class SnippetListView extends ConsumerWidget {
                       prefixIcon: const Icon(Icons.search),
                       hintText: "Search snippets...",
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Theme.of(context).colorScheme.surface,
                       contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -68,7 +68,6 @@ class SnippetListView extends ConsumerWidget {
                     return ChoiceChip(
                       label: Text(lang),
                       selected: selected,
-                      selectedColor: Colors.blue.shade200,
                       onSelected: (_) {
                         final tags = ref.read(snippetTagFilterProvider.notifier).state;
                         print(tags);
@@ -150,7 +149,7 @@ class SnippetListView extends ConsumerWidget {
                                   Chip(
                                     label: Text(s.language),
                                     backgroundColor:
-                                        Colors.blue.shade100,
+                                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                                   ),
 
                                   const SizedBox(height: 6),
@@ -162,7 +161,7 @@ class SnippetListView extends ConsumerWidget {
                                       return Chip(
                                         label: Text(t),
                                         backgroundColor:
-                                            Colors.green,
+                                        Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
                                       );
                                     }).toList(),
                                   ),
@@ -230,7 +229,6 @@ class SnippetListView extends ConsumerWidget {
             code: 'print("test, World!")',
             language: 'java',
             tags: ["Python", "Java"],
-            author: 'User',
           );
         },
         child: const Icon(Icons.add),
