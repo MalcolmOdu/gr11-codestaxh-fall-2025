@@ -41,7 +41,7 @@ class AuthService {
   }
 
   //Sign in with github
-  Future<UserCredential?> signInWithGithub() async {
+  Future<UserCredential?> signInWithGitHub() async {
     try{
       GithubAuthProvider githubProvider = GithubAuthProvider();
       if (kIsWeb) {

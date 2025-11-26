@@ -5,8 +5,10 @@ import 'firebase_options.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'models/snippet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'views/web/snippet_editor_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'theme/app_theme.dart';
+import 'theme/theme_provider.dart';
+import 'views/auth/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,18 +28,19 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
-      title: 'CodestaXh',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const SnippetEditorView(),
+      title: 'CodeStaxh',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
+      home: const AuthGate(),
     );
   }
 }
