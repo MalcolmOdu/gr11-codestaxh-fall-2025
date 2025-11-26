@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:codestaxh/models/snippet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -125,3 +126,31 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
 final snippetProvider = NotifierProvider<SnippetNotifier, List<Snippet>>(() {
   return SnippetNotifier();
 });
+
+// --- UI filtering state ---
+final snippetSearchProvider = StateProvider<String>((ref) => "");
+final snippetTagFilterProvider = StateProvider<Set<String>>((ref) => {});
+
+// --- Derived filtered list ---
+final filteredSnippetsProvider = Provider<List<Snippet>>((ref) {
+  final snippets = ref.watch(snippetProvider);
+  final search = ref.watch(snippetSearchProvider);
+  final tags = ref.watch(snippetTagFilterProvider);
+
+  final lowerTags = tags.map((t)=> t.toLowerCase()).toSet();
+
+  //ADD MORE SEARCH PARAMETERS HERE IF NECESSARY
+  return snippets.where((s) {
+    final matchesSearch = search.isEmpty ||
+        s.title.toLowerCase().contains(search.toLowerCase()) ||
+        s.code.toLowerCase().contains(search.toLowerCase()) || 
+        s.language.toLowerCase().contains(search.toLowerCase());
+
+    final matchesTags = tags.isEmpty || s.tags.map((t)=> t.toLowerCase()).any(lowerTags.contains);
+
+
+    return matchesSearch && matchesTags;
+  }).toList();
+}
+);
+
