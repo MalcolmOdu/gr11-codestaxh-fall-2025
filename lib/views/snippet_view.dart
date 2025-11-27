@@ -32,10 +32,11 @@ class SnippetListView extends ConsumerWidget {
             child: Column(
               children: [
                 // SEARCH BAR
-                SizedBox(
-                  width: double.infinity,
-                  
-                  child: TextField(
+                Row(
+                  children: [
+                  Expanded(
+                  child:
+                  TextField(
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       hintText: "Search snippets...",
@@ -51,6 +52,12 @@ class SnippetListView extends ConsumerWidget {
                       ref.read(snippetSearchProvider.notifier).state = value;
                     }
                   ),
+                  ),
+                  IconButton(
+                    onPressed: (){},
+                    icon: Icon(Icons.tune)
+                    )
+                  ]
                 ),
 
           const SizedBox(height: 12),
@@ -149,8 +156,7 @@ class SnippetListView extends ConsumerWidget {
                                   // LANGUAGE BADGE
                                   Chip(
                                     label: Text(s.language),
-                                    backgroundColor:
-                                        Colors.blue.shade100,
+                                    
                                   ),
 
                                   const SizedBox(height: 6),
@@ -161,8 +167,6 @@ class SnippetListView extends ConsumerWidget {
                                     children: s.tags.take(2).map((t) {
                                       return Chip(
                                         label: Text(t),
-                                        backgroundColor:
-                                            Colors.green,
                                       );
                                     }).toList(),
                                   ),

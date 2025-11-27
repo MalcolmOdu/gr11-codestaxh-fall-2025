@@ -4,6 +4,7 @@ import '../controllers/snippet_controller.dart';
 import 'package:codestaxh/controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github-dark.dart';
+import 'package:flutter/services.dart';
 
 
 
@@ -22,7 +23,7 @@ class DetailedView extends ConsumerWidget {
       appBar: AppBar(
         toolbarHeight: 80,
         backgroundColor: Colors.lightBlue,
-        title: Text("Author: ${snippet.author}"),
+        title: Text("Code Snippet"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(8),
@@ -58,15 +59,14 @@ class DetailedView extends ConsumerWidget {
 
                 
                   Container(
-                    height: 400,
-                    width: 400,
+                    width: double.infinity,
                    
                     decoration: BoxDecoration(
                       color: const Color.fromARGB(255, 0, 0, 0),
                       borderRadius: BorderRadius.circular(16)
                     ),
                     child:
-                    Padding(padding: const EdgeInsets.all(12),
+                    Padding(padding: const EdgeInsets.all(0),
                       child:
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -75,16 +75,18 @@ class DetailedView extends ConsumerWidget {
                         children: [
                              Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                                 decoration: BoxDecoration(
                                   
-                                  color: const Color.fromARGB(255, 36, 35, 35),                     // slightly darker bar
+                                  color: const Color.fromARGB(255, 72, 70, 70),                     // slightly darker bar
                                   borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(12),
+                                     top: Radius.circular(8),
                                   
                                   ),
                                 ),
-                                child: const Text(
+                                child: Row(
+                                  children: [
+                                 const Text(
                                   "Code",
                                   style: TextStyle(
                                     color: Colors.white,
@@ -92,7 +94,23 @@ class DetailedView extends ConsumerWidget {
                                     fontSize: 16,
                                   ),
                                 ),
+                                Spacer(),
+                                IconButton(
+                                  icon: const Icon(Icons.copy, color: Colors.white, size: 20),
+                                  onPressed: () {
+                                    // Copy snippet to clipboard
+                                    Clipboard.setData(ClipboardData(text: snippet.code));
+                                    
+                                    // Optional: show a snackbar
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Code copied to clipboard!")),
+                                    );
+                                  }
+                                ),
+                                  ]
+                                )
                               ),
+                        
                               const SizedBox(height: 8.0),
                           
                               ClipRRect(
@@ -167,10 +185,33 @@ class DetailedView extends ConsumerWidget {
                             fontSize: 20
                           ),),
                         ],
+                      
                       ),
+                      
 
                      ]
-                  )
+                  ),
+                  RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: " Author \n ",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black, // important!
+                            ),
+                          ),
+                          TextSpan(
+                            text: snippet.author,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ]
               
             )
