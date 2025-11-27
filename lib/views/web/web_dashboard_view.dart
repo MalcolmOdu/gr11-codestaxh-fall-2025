@@ -7,15 +7,16 @@ import '../snippet_view.dart';
 import 'snippet_editor_view.dart';
 import '../shared/profile_view.dart';
 import '../detailed_view.dart';
+import '../../theme/app_theme.dart';
+
+// Display how recent activity is in feed without creating custom DateTime formatting method.
+import 'package:timeago/timeago.dart' as timeago;
 
 /// TODO
-///   tag color generator- could make simple random color generator that creates colors
-///     and maps them to new tags entered. Can be used to make tags in activity list more distinct.
-///   abandon colors declared here, use dark theme
-///   stats from wireframe pics
 ///   route to team view
 ///   repalce placeholder pfps with actual ones in activity list
 ///   make code snippet wrap around if too large for container
+///   add dropdown INSIDE search bar to allow search to only look for tags/code content/title/author/etc
 
 class WebDashboardView extends ConsumerWidget {
   const WebDashboardView({super.key});
@@ -25,8 +26,14 @@ class WebDashboardView extends ConsumerWidget {
     final user = FirebaseAuth.instance.currentUser;
     final snippets = ref.watch(snippetProvider);
 
+    // Calculate Stats
+    final mySnippets = snippets.where((s) => s.author == user?.displayName || s.author == user?.email).toList();
+    final totalUpvotes = mySnippets.fold(0, (sum, item) => sum + item.upvote);
+    
+    // Sort snippets by date for "Recent Activity"
+    final recentSnippets = List.of(snippets)..sort((a, b) => b.dateAdded.compareTo(a.dateAdded));
+
     return Scaffold(
-      backgroundColor: Colors.blue,
       body: Padding(
         padding: EdgeInsetsGeometry.symmetric(vertical: 20, horizontal: 40),
         child: Column(
@@ -49,6 +56,14 @@ class WebDashboardView extends ConsumerWidget {
                           fontWeight: FontWeight.w500,
 
                         ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _buildStatItem(context, count: mySnippets.length, label: 'Snippets Created'),
+                          _buildStatItem(context, count: totalUpvotes, label: 'Upvotes Received'),
+                          _buildStatItem(context, count: 0, label: 'Teams'), // Placeholder for teams
+                        ],
                       ),
                       const SizedBox(height: 32),
 
@@ -146,10 +161,10 @@ class WebDashboardView extends ConsumerWidget {
                         ListView.separated(
                           shrinkWrap: true,
                           //physics: const NeverScrollableScrollPhysics(),
-                          itemCount: snippets.take(10).length, // Show 10 most recent
+                          itemCount: recentSnippets.take(10).length, // Show 10 most recent
                           separatorBuilder: (context, index) => Divider(height: 1, color: const Color.fromARGB(255, 90, 90, 90)),
                           itemBuilder: (context, index) {
-                            final snippet = snippets[index];
+                            final snippet = recentSnippets[index];
                             return _ActivityListItem(snippet: snippet, user: user);
                           },
                         ),
@@ -166,16 +181,51 @@ class WebDashboardView extends ConsumerWidget {
       )
     );
   }
-
+  Widget _buildStatItem(BuildContext context, {required int count, required String label}) {
+    
+    // Fetch global theme
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Padding(
+      padding: const EdgeInsets.only(right: 24.0),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$count ',
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.8),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            TextSpan(
+              text: label,
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
   
   // Helper widget, creates nav bar and includes user profile icon and view profile button
   Widget _buildNavBar(BuildContext context, User? user) {
+
+    // fetch global theme
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       height: 90,
       padding: const EdgeInsets.symmetric(horizontal: 32),
       decoration: BoxDecoration(
-        color: Colors.blue,
-        border: Border(bottom: BorderSide(color: const Color.fromARGB(255, 90, 90, 90))),
+        color: colorScheme.surface,
+        border: Border(bottom: BorderSide(color: colorScheme.outline)),
       ),
       child: Center(
         child: Row(
@@ -183,10 +233,10 @@ class WebDashboardView extends ConsumerWidget {
           children: [
 
             // App name
-            const Text(
+            Text(
               'Codestaxh',
               style: TextStyle(
-                color: Colors.white,
+                color: colorScheme.onSurface,
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
               ),
@@ -201,6 +251,9 @@ class WebDashboardView extends ConsumerWidget {
                 children: [
                   Text(
                     'My Profile',
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withValues(alpha: 0.8)
+                    ),
                   ),
                   const SizedBox(width: 20),
 
@@ -220,7 +273,7 @@ class WebDashboardView extends ConsumerWidget {
                       ),
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundColor: Color.fromARGB(255, 20, 0, 110),
+                        backgroundColor: colorScheme.primary,
                         backgroundImage: user?.photoURL != null
                             ? NetworkImage(user!.photoURL!)
                             : null,
@@ -228,7 +281,7 @@ class WebDashboardView extends ConsumerWidget {
                             ? Icon(
                           Icons.person,
                           size: 50,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Theme.of(context).colorScheme.surface,
                         )
                             : null,
                       ),
@@ -269,6 +322,11 @@ class _QuickActionCardState extends State<_QuickActionCard> {
 
   @override
   Widget build(BuildContext context) {
+
+    // fetch global theme
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -281,13 +339,18 @@ class _QuickActionCardState extends State<_QuickActionCard> {
           duration: const Duration(milliseconds: 200),
           height: 120,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 195, 217, 255),
+            color: theme.cardTheme.color,
             borderRadius: BorderRadius.circular(16),
             // Updates on hover state change
             border: Border.all(
-              color: _isHovered ? Colors.purple : Color.fromARGB(255, 195, 217, 255),
+              color: _isHovered ? widget.color : colorScheme.outline,
               width: 2
             ),
+            // Outline and glow effect when hovered.
+            boxShadow: [
+              if (_isHovered)
+                BoxShadow(color:widget.color.withValues(alpha:0.15), blurRadius: 15, spreadRadius: 2)
+            ]
           ),
 
           // Text/icon contents
@@ -309,8 +372,10 @@ class _QuickActionCardState extends State<_QuickActionCard> {
               const SizedBox(height: 12),
               Text(
                 widget.title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -333,6 +398,10 @@ class _ActivityListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    // fetch global theme
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     // Used to display "You" if activity is from user
     final bool isCurrentUser = snippet.author == user?.displayName || snippet.author == user?.email;
     final String authorName = isCurrentUser ? "You" : snippet.author;
@@ -342,8 +411,9 @@ class _ActivityListItem extends StatelessWidget {
          Navigator.push(context, MaterialPageRoute(builder: (_) => DetailedView(id: snippet.id)));
       },
       borderRadius: BorderRadius.circular(20),
+      hoverColor: colorScheme.primary,
       child: Container(
-        color: Colors.white,
+        color: theme.cardColor,
         padding: const EdgeInsets.all(20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,7 +425,7 @@ class _ActivityListItem extends StatelessWidget {
               backgroundColor: _getColorForName(snippet.author),
               child: Text(
                 snippet.author.isNotEmpty ? snippet.author[0].toUpperCase() : '?',
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(color: Colors.white, fontSize: 14),
               ),
             ),
             const SizedBox(width: 16),
@@ -374,12 +444,12 @@ class _ActivityListItem extends StatelessWidget {
                         // Author
                         TextSpan(
                           text: authorName, 
-                          style: const TextStyle(fontWeight: FontWeight.bold)
+                          style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onSurface)
                         ),
-                        // Spacing
+                        // Spacing (whitespace with 100% alpha just in case)
                         TextSpan(
                           text: '  ', 
-                          style: const TextStyle(color: Colors.grey)
+                          style: TextStyle(color: Colors.white.withValues(alpha: 1.0))
                         ),
 
                          // Tags (if applicable)
@@ -410,9 +480,10 @@ class _ActivityListItem extends StatelessWidget {
                   // Snippet Title
                   Text(
                     snippet.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -421,12 +492,18 @@ class _ActivityListItem extends StatelessWidget {
                   Text(
                     snippet.code.replaceAll('\n', ' '),
                     style: TextStyle(
-                      color: Colors.grey.shade500,
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                       fontSize: 13,
                     ),
                   ),
                 ],
               ),
+            ),
+
+            // How long ago the activity was posted
+            Text(
+              timeago.format(snippet.dateAdded),
+              style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.4), fontSize: 12),
             ),
           ],
         ),
