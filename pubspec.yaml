@@ -18,6 +18,8 @@ dependencies:
   flutter_highlight: ^0.7.0
   http: ^1.2.0
   cloud_firestore: ^5.5.0
+  flutter_highlighting: ^0.9.0+11.8.0
+  
   firebase_auth: ^5.3.3
   google_sign_in: ^6.2.2
   flutter_native_splash: ^2.4.1

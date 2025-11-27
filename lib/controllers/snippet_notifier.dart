@@ -116,6 +116,7 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
       author: snippet.author,
       upvote: snippet.upvote + 1,
       dateAdded: snippet.dateAdded,
+      description: snippet.description,
       teamId: snippet.teamId,
     );
 

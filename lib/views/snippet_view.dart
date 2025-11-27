@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/snippet_controller.dart';
 import '../controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
-import 'package:flutter_highlight/themes/github.dart';
+import 'package:flutter_highlighting/themes/github.dart';
 import 'package:codestaxh/views/detailed_view.dart';
 import '../../views/shared/profile_view.dart';
 
@@ -48,20 +48,61 @@ class SnippetListView extends ConsumerWidget {
             child: Column(
               children: [
                 // SEARCH BAR
-                TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    hintText: "Search snippets...",
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.surface,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                Row(
+                  children: [
+                  Expanded(
+                  child:
+                  TextField(
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: "Search snippets...",
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
-                  onChanged: (value) {
-                    ref.read(snippetSearchProvider.notifier).state = value;
+                  ),
+                  IconButton(
+                    onPressed: (){},
+                    icon: Icon(Icons.tune)
+                    )
+                  ]
+                ),
+
+          const SizedBox(height: 12),
+
+          // TAG FILTER, add filter implementation here 
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final lang in ["Python", "Java", "Dart", "C++"])
+                Consumer(
+                  builder: (context, ref, _) {
+                    final selected = ref.watch(snippetTagFilterProvider).contains(lang);
+
+                    return ChoiceChip(
+                      label: Text(lang),
+                      selected: selected,
+                      selectedColor: Colors.blue.shade200,
+                      onSelected: (_) {
+                        final tags = ref.read(snippetTagFilterProvider.notifier).state;
+                        print(tags);
+                        final newSet = Set<String>.from(tags);
+
+                        if (selected) {
+                          newSet.remove(lang);
+                        } else {
+                          newSet.add(lang);
+                        }
+
+                        ref.read(snippetTagFilterProvider.notifier).state = newSet;
+                      },
+                    );
                   },
                 ),
 
@@ -110,45 +151,12 @@ class SnippetListView extends ConsumerWidget {
 
                 const SizedBox(height: 12),
 
-                // LANGUAGE FILTER
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final lang in ["Python", "Java", "Dart", "C++"])
-                      Consumer(
-                        builder: (context, ref, _) {
-                          final selected = ref
-                              .watch(snippetTagFilterProvider)
-                              .contains(lang);
-
-                          return ChoiceChip(
-                            label: Text(lang),
-                            selected: selected,
-                            onSelected: (_) {
-                              final tags = ref
-                                  .read(snippetTagFilterProvider.notifier)
-                                  .state;
-                              final newSet = Set<String>.from(tags);
-
-                              if (selected) {
-                                newSet.remove(lang);
-                              } else {
-                                newSet.add(lang);
-                              }
-
-                              ref.read(snippetTagFilterProvider.notifier).state =
-                                  newSet;
-                            },
-                          );
-                        },
-                      ),
-                  ],
-                ),
               ],
             ),
+              ]
           ),
         ),
+      ),
       ),
       body: filteredSnippets.isEmpty
           ? _buildEmptyState(context, filterType)
@@ -301,19 +309,6 @@ class SnippetListView extends ConsumerWidget {
             ),
           );
         },
-      ),
-
-      // Temp FAB for testing
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          controller.addSnippet(
-            title: 'Test Snippet ${DateTime.now().second}',
-            code: 'print("Hello, World!")',
-            language: 'Python',
-            tags: ["test", "example"],
-          );
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }

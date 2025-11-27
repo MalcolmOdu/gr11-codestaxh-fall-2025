@@ -14,6 +14,7 @@ class SnippetController {
     required String code,
     required String language,
     required List<String> tags,
+    String? description,
     String? teamId,
   }) async {
     const uuid = Uuid();
@@ -30,6 +31,7 @@ class SnippetController {
       author: author,
       upvote: 0,
       dateAdded: DateTime.now(),
+      description: description,
       teamId: teamId,
     );
 
@@ -47,6 +49,7 @@ class SnippetController {
     required String code,
     required String language,
     required List<String> tags,
+    String? description,
     String? teamId,
   }) async {
     final snippets = ref.read(snippetProvider);
@@ -61,6 +64,7 @@ class SnippetController {
       author: oldSnippet.author,
       upvote: oldSnippet.upvote,
       dateAdded: oldSnippet.dateAdded,
+      description: description ?? oldSnippet.description,
       teamId: teamId ?? oldSnippet.teamId,
     );
 

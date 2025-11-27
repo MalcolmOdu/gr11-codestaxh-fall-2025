@@ -31,6 +31,9 @@ class Snippet extends HiveObject {
   @HiveField(8)
   final String? teamId;
 
+  @HiveField(9)
+  final String?description;
+
   Snippet({
     required this.id,
     required this.title,
@@ -40,6 +43,7 @@ class Snippet extends HiveObject {
     required this.author,
     required this.upvote,
     required this.dateAdded,
+    this.description,
     this.teamId,
   });
 
@@ -54,6 +58,7 @@ class Snippet extends HiveObject {
       'author': author,
       'upvote': upvote,
       'dateAdded': Timestamp.fromDate(dateAdded), //Firestore needs Timestamp
+      'description': description,
       'teamId': teamId,
     };
   }
@@ -69,6 +74,7 @@ class Snippet extends HiveObject {
       author: map['author'] as String,
       upvote: map['upvote'] as int,
       dateAdded: (map['dateAdded'] as Timestamp).toDate(),
+      description: map['description'] as String?,
       teamId: map['teamId'] as String?,
     );
   }
