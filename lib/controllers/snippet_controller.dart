@@ -14,7 +14,6 @@ class SnippetController {
     required String code,
     required String language,
     required List<String> tags,
-    required String author,
     String? description,
     String? teamId,
   }) async {

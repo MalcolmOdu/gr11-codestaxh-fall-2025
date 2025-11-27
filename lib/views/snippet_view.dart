@@ -345,8 +345,7 @@ class SnippetListView extends ConsumerWidget {
           );
         },
       ),
-      )
-    )
+    );
   }
 
   Widget _buildEmptyState(BuildContext context, SnippetFilterType filterType) {
