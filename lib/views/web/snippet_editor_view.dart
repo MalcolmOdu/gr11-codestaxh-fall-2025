@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:codestaxh/controllers/snippet_controller.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../../controllers/team_notifier.dart';
+import '../../views/web/team_management_view.dart';
+import '../../views/shared/profile_view.dart';
 
 class SnippetEditorView extends ConsumerStatefulWidget {
   //if editing existing snippet, pass ID
@@ -20,6 +22,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
   final _codeController = TextEditingController();
   final _tagController = TextEditingController();
 
+  String? _selectedTeamId;
   String _selectedLanguage = 'Python';
 
   //list of available languages
@@ -61,6 +64,36 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
             .of(context)
             .colorScheme
             .inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.groups),
+            tooltip: 'Manage Teams',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TeamManagementView(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: 'Profile',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfileView(),
+                ),
+              );
+            },
+          ),
+
+          const SizedBox(width: 8),
+        ],
       ),
       body: Center(
         child: ConstrainedBox(
@@ -82,6 +115,55 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
                 //tags selector
                 _buildTagsSelector(),
                 const SizedBox(height: 24),
+
+                //Team Selector
+                Consumer(
+                  builder: (context, ref, _) {
+                    final teams = ref.watch(teamProvider);
+                    if (teams.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Share with Team (Optional)',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String?>(
+                          initialValue: _selectedTeamId,
+                          decoration: const InputDecoration(
+                            labelText: 'Team',
+                            hintText: 'Select a team to share with',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.group),
+                          ),
+                          items: [
+                            const DropdownMenuItem<String?>(
+                              value: null,
+                              child: Text('Personal (Not Shared)'),
+                            ),
+                            ...teams.map((team) {
+                              return DropdownMenuItem<String>(
+                                value: team.id,
+                                child: Text(team.name),
+                              );
+                            }).toList(),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedTeamId = value;
+                            });
+                          },
+                        )
+                      ]
+                    );
+                  }
+                ),
 
                 //buttons
                 _buildActionButtons(),
@@ -407,18 +489,24 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
     //snippet using SnippetController
     final controller = SnippetController(ref);
 
+
     try {
       await controller.addSnippet(
         title: title,
         code: code,
         language: _selectedLanguage,
         tags: _tags,
+        teamId: _selectedTeamId,
       );
 
       if (mounted) { // Check if widget still exists
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Snippet saved and synced to cloud!'),
+          SnackBar(
+          content: Text(
+            _selectedTeamId != null
+                ? 'Snippet saved and shared with team "'
+                : 'Snippet saved!',
+          ),
             backgroundColor: Colors.green,
           ),
         );
