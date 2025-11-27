@@ -14,7 +14,7 @@ class TeamNotifier extends Notifier<List<Team>> {
 
   void _listenToFirestoreChange() {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null) return;
+    if (user == null) return;
 
     _teamsCollection.snapshots().listen((snapshot) {
       final teams = <Team>[];

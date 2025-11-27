@@ -21,7 +21,7 @@ class Team {
       'name': name,
       'ownerId': ownerId,
       'members': members,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
   factory Team.fromMap(Map<String, dynamic> map) {
