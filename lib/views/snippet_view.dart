@@ -151,41 +151,6 @@ class SnippetListView extends ConsumerWidget {
 
                 const SizedBox(height: 12),
 
-                // LANGUAGE FILTER
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final lang in ["Python", "Java", "Dart", "C++"])
-                      Consumer(
-                        builder: (context, ref, _) {
-                          final selected = ref
-                              .watch(snippetTagFilterProvider)
-                              .contains(lang);
-
-                          return ChoiceChip(
-                            label: Text(lang),
-                            selected: selected,
-                            onSelected: (_) {
-                              final tags = ref
-                                  .read(snippetTagFilterProvider.notifier)
-                                  .state;
-                              final newSet = Set<String>.from(tags);
-
-                              if (selected) {
-                                newSet.remove(lang);
-                              } else {
-                                newSet.add(lang);
-                              }
-
-                              ref.read(snippetTagFilterProvider.notifier).state =
-                                  newSet;
-                            },
-                          );
-                        },
-                      ),
-                  ],
-                ),
               ],
             ),
               ]
