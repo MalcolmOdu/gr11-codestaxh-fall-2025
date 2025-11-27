@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../models/snippet.dart';
@@ -18,6 +19,8 @@ class SnippetController {
   }) async {
     const uuid = Uuid();
     final id = uuid.v4();
+    final user = FirebaseAuth.instance.currentUser!;
+    final author = user.displayName ?? user.email ?? 'Anonymous';
 
     final snippet = Snippet(
       id: id,

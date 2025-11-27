@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:codestaxh/controllers/snippet_controller.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SnippetEditorView extends ConsumerStatefulWidget {
   //if editing existing snippet, pass ID
@@ -29,7 +30,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
     'Dart',
     'C++',
     'Go',
-    'RUst',
+    'Rust',
     'C#',
     'Ruby',
     'Kotlin',
@@ -412,13 +413,12 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
         code: code,
         language: _selectedLanguage,
         tags: _tags,
-        author: 'Test User',
       );
 
       if (mounted) { // Check if widget still exists
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Snippet saved and synced to cloud! ☁️'),
+            content: Text('Snippet saved and synced to cloud!'),
             backgroundColor: Colors.green,
           ),
         );
