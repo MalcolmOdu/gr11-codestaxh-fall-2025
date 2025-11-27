@@ -1,3 +1,4 @@
+import 'package:codestaxh/views/web/web_dashboard_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
@@ -7,6 +8,9 @@ import '../../views/web/snippet_editor_view.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../views/snippet_view.dart';
 
+
+// Allows detect platform, used to determine which screen to use (web vs mobile)
+import 'package:flutter/foundation.dart';
 
 // this widget shows login screen or main app based on auth state
 class AuthGate extends ConsumerWidget {
@@ -161,12 +165,24 @@ class AuthGate extends ConsumerWidget {
           return const LoginView();
         }
 
-        if (kIsWeb){
+        try {
+          // Determines which device type the app is launched on
+          final isDesktop = 
+            kIsWeb  // Launched in browser (may be irrelevant depending on how final project is launched)
+            || defaultTargetPlatform == TargetPlatform.macOS    // Desktop view
+            || defaultTargetPlatform == TargetPlatform.windows  // Desktop view
+            || defaultTargetPlatform == TargetPlatform.linux;   // Desktop view
+          
+          if (isDesktop){return const WebDashboardView();}
+          else {return const SnippetEditorView();}
+        }
+        catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: device type could not be resolved.'))
+          );
           return const SnippetEditorView();
         }
-        else{
-          return const SnippetListView();
-        }
+        
       },
     );
   }
