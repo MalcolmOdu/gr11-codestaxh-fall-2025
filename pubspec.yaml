@@ -18,6 +18,9 @@ dependencies:
   flutter_highlight: ^0.7.0
   http: ^1.2.0
   cloud_firestore: ^5.5.0
+  clipboard: ^2.0.2
+  flutter_highlighting: ^0.9.0+11.8.0
+  
 
 dev_dependencies:
   flutter_test:

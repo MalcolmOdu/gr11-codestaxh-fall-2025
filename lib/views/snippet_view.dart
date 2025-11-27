@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/snippet_controller.dart';
 import '../controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
-import 'package:flutter_highlight/themes/github.dart';
+import 'package:flutter_highlighting/themes/github.dart';
 import 'package:codestaxh/views/detailed_view.dart';
 
 
@@ -23,7 +23,7 @@ class SnippetListView extends ConsumerWidget {
       appBar: AppBar(
         title: const Text("Snippets"),
         toolbarHeight: 140,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.lightBlue,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(80),
           child: Padding(
