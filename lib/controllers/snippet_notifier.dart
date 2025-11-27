@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:codestaxh/models/snippet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive_ce/hive.dart';
+import 'package:hive/hive.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 //This notifier manages the list of snippets
 class SnippetNotifier extends Notifier<List<Snippet>> {
@@ -115,6 +116,7 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
       author: snippet.author,
       upvote: snippet.upvote + 1,
       dateAdded: snippet.dateAdded,
+      teamId: snippet.teamId,
     );
 
 
@@ -131,11 +133,17 @@ final snippetProvider = NotifierProvider<SnippetNotifier, List<Snippet>>(() {
 final snippetSearchProvider = StateProvider<String>((ref) => "");
 final snippetTagFilterProvider = StateProvider<Set<String>>((ref) => {});
 
+enum SnippetFilterType {all, personal, team}
+
+final snippetFilterProvider = StateProvider<SnippetFilterType>((ref) => SnippetFilterType.all);
+
 // --- Derived filtered list ---
 final filteredSnippetsProvider = Provider<List<Snippet>>((ref) {
   final snippets = ref.watch(snippetProvider);
   final search = ref.watch(snippetSearchProvider);
   final tags = ref.watch(snippetTagFilterProvider);
+  final filterType = ref.watch(snippetFilterProvider);
+  final user = FirebaseAuth.instance.currentUser;
 
   final lowerTags = tags.map((t)=> t.toLowerCase()).toSet();
 
@@ -146,11 +154,21 @@ final filteredSnippetsProvider = Provider<List<Snippet>>((ref) {
         s.code.toLowerCase().contains(search.toLowerCase()) || 
         s.language.toLowerCase().contains(search.toLowerCase());
 
-    final matchesTags = tags.isEmpty || s.tags.map((t)=> t.toLowerCase()).any(lowerTags.contains);
+    final matchesTags = tags.isEmpty || tags.contains(s.language) || s.tags.map((t)=> t.toLowerCase()).any(lowerTags.contains);
 
-
-    return matchesSearch && matchesTags;
+    bool matchesTeamFilter = true;
+    switch (filterType) {
+      case SnippetFilterType.all:
+        matchesTeamFilter = true;
+        break;
+      case SnippetFilterType.personal:
+        matchesTeamFilter = s.teamId == null && (s.author == user?.displayName || s.author == user?.email);
+        break;
+      case SnippetFilterType.team:
+        matchesTeamFilter = s.teamId != null;
+        break;
+    }
+    return matchesSearch && matchesTags && matchesTeamFilter;
   }).toList();
-}
-);
+});
 
