@@ -132,6 +132,7 @@ final snippetProvider = NotifierProvider<SnippetNotifier, List<Snippet>>(() {
 final snippetSearchProvider = StateProvider<String>((ref) => "");
 final snippetTagFilterProvider = StateProvider<Set<String>>((ref) => {});
 
+
 // --- Derived filtered list ---
 final filteredSnippetsProvider = Provider<List<Snippet>>((ref) {
   final snippets = ref.watch(snippetProvider);
