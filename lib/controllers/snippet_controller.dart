@@ -16,6 +16,7 @@ class SnippetController {
     required List<String> tags,
     required String author,
     String? description,
+    String? teamId,
   }) async {
     const uuid = Uuid();
     final id = uuid.v4();
@@ -32,6 +33,7 @@ class SnippetController {
       upvote: 0,
       dateAdded: DateTime.now(),
       description: description,
+      teamId: teamId,
     );
 
     await ref.read(snippetProvider.notifier).add(snippet);
@@ -49,6 +51,7 @@ class SnippetController {
     required String language,
     required List<String> tags,
     String? description,
+    String? teamId,
   }) async {
     final snippets = ref.read(snippetProvider);
     final oldSnippet = snippets.firstWhere((s) => s.id == id);
@@ -63,6 +66,7 @@ class SnippetController {
       upvote: oldSnippet.upvote,
       dateAdded: oldSnippet.dateAdded,
       description: description ?? oldSnippet.description,
+      teamId: teamId ?? oldSnippet.teamId,
     );
 
     await ref.read(snippetProvider.notifier).update(id, updatedSnippet);

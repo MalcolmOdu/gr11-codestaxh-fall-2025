@@ -8,7 +8,7 @@ part of 'snippet.dart';
 
 class SnippetAdapter extends TypeAdapter<Snippet> {
   @override
-  final typeId = 1;
+  final int typeId = 1;
 
   @override
   Snippet read(BinaryReader reader) {
@@ -23,15 +23,16 @@ class SnippetAdapter extends TypeAdapter<Snippet> {
       language: fields[3] as String,
       tags: (fields[4] as List).cast<String>(),
       author: fields[5] as String,
-      upvote: (fields[6] as num).toInt(),
+      upvote: fields[6] as int,
       dateAdded: fields[7] as DateTime,
+      teamId: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Snippet obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class SnippetAdapter extends TypeAdapter<Snippet> {
       ..writeByte(6)
       ..write(obj.upvote)
       ..writeByte(7)
-      ..write(obj.dateAdded);
+      ..write(obj.dateAdded)
+      ..writeByte(8)
+      ..write(obj.teamId);
   }
 
   @override

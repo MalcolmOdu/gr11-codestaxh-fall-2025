@@ -1,4 +1,4 @@
-import 'package:hive_ce/hive.dart';
+import 'package:hive/hive.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 part 'snippet.g.dart';
 
@@ -29,7 +29,10 @@ class Snippet extends HiveObject {
   final DateTime dateAdded;
 
   @HiveField(8)
-  final String? description;
+  final String? teamId;
+
+  @HiveField(9)
+  final String?description;
 
   Snippet({
     required this.id,
@@ -40,7 +43,8 @@ class Snippet extends HiveObject {
     required this.author,
     required this.upvote,
     required this.dateAdded,
-    this.description
+    this.description,
+    this.teamId,
   });
 
   //Snippet to Map for Firestore
@@ -55,6 +59,7 @@ class Snippet extends HiveObject {
       'upvote': upvote,
       'dateAdded': Timestamp.fromDate(dateAdded), //Firestore needs Timestamp
       'description': description,
+      'teamId': teamId,
     };
   }
 
@@ -70,6 +75,7 @@ class Snippet extends HiveObject {
       upvote: map['upvote'] as int,
       dateAdded: (map['dateAdded'] as Timestamp).toDate(),
       description: map['description'] as String?,
+      teamId: map['teamId'] as String?,
     );
   }
 
