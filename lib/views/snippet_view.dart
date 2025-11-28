@@ -5,8 +5,7 @@ import '../controllers/snippet_controller.dart';
 import '../controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github.dart';
-import 'package:codestaxh/views/detailed_view.dart';
-import '../../views/shared/profile_view.dart';
+import 'package:codestaxh/app_router.dart';
 
 
 class SnippetListView extends ConsumerWidget {
@@ -31,12 +30,7 @@ class SnippetListView extends ConsumerWidget {
             icon: const Icon(Icons.person),
             tooltip: 'Profile',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileView(),
-                ),
-              );
+              context.pushProfile();
             },
           ),
           const SizedBox(width: 8),
@@ -168,12 +162,7 @@ class SnippetListView extends ConsumerWidget {
           final preview = s.code.split('\n').take(3).join('\n');
 
           return InkWell(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DetailedView(id: s.id),
-              ),
-            ),
+            onTap: () => context.pushSnippetDetail(s.id),
             child: Card(
               margin: const EdgeInsets.symmetric(
                 horizontal: 12,
