@@ -272,7 +272,7 @@ class WebDashboardView extends ConsumerWidget {
                       },
                       icon: Badge(
                         isLabelVisible: unreadNotifs.isNotEmpty, // Only show badge if unread notifications
-                        label: Text('$unreadNotifs'),     // Number of unread displayed
+                        label: Text('!'),     // Number of unread displayed
                         backgroundColor: colorScheme.tertiary,
                         child: Icon(
                           unreadNotifs.isNotEmpty ? Icons.notifications_active : Icons.notifications_outlined,

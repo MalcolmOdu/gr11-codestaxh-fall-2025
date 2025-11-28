@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/team.dart';
+import '../providers/notification_provider.dart';
 
 class TeamNotifier extends Notifier<List<Team>> {
   final CollectionReference _teamsCollection = FirebaseFirestore.instance.collection('teams');
@@ -75,6 +76,14 @@ class TeamNotifier extends Notifier<List<Team>> {
     try{
       await _teamsCollection.doc(teamId).update({'members': updatedMembers});
       print('Member $newUserId added to team $teamId');
+
+      // Send notification to new member about joining
+      await NotificationProvider.sendNotification(
+        toUserId: newUserId,
+        title: 'Team Invitation',
+        body: "You've been added to a new team, ${team.name}",
+        iconString: 'invite'
+      );
     } catch (e) {
       print('Error adding member: $e');
       rethrow;
@@ -93,6 +102,14 @@ class TeamNotifier extends Notifier<List<Team>> {
     try {
       await _teamsCollection.doc(teamId).update({'members': updatedMembers});
       print('Member $userId removed from team $teamId');
+
+      // Notify user of removal
+      await NotificationProvider.sendNotification(
+        toUserId: userId,
+        title: 'Removed from Team',
+        body: "You've been removed from: ${team.name}",
+        iconString: 'invite'
+      );
     } catch (e) {
       print('Error removing member: $e');
       rethrow;

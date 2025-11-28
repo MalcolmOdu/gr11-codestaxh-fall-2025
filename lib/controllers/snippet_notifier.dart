@@ -140,6 +140,8 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
   Future<void> upvote(String id) async {
     final snippet = state.firstWhere((s) => s.id == id);
 
+    final currentUser = FirebaseAuth.instance.currentUser;
+
     final updatedSnippet = Snippet(
       id: snippet.id,
       title: snippet.title,
@@ -156,6 +158,18 @@ class SnippetNotifier extends Notifier<List<Snippet>> {
 
 
     await update(id, updatedSnippet);
+
+    if (currentUser != null
+      && snippet.authorId != null
+      && snippet.authorId!.isNotEmpty
+      && snippet.authorId != currentUser.uid) {
+      await NotificationProvider.sendNotification(
+        toUserId: snippet.authorId!,
+        title: 'Snippet Upvoted',
+        body: '${currentUser.displayName ?? "Someone"} upvoted your snippet: ${snippet.title}',
+        iconString: 'upvote'
+      );
+    }
   }
 }
 
