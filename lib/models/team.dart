@@ -25,12 +25,22 @@ class Team {
     };
   }
   factory Team.fromMap(Map<String, dynamic> map) {
+    DateTime parsedDate;
+    final createdAtField = map['createdAt'];
+
+    if (createdAtField is Timestamp) {
+      parsedDate = createdAtField.toDate();
+    } else if (createdAtField is String) {
+      parsedDate = DateTime.parse(createdAtField);
+    } else {
+      parsedDate = DateTime.now();
+    }
     return Team(
       id: map['id'] as String,
       name: map['name'] as String,
       ownerId: map['ownerId'] as String,
       members: List<String>.from(map['members'] as List),
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      createdAt: parsedDate,
     );
   }
   factory Team.fromFirestore(DocumentSnapshot doc) {

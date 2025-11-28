@@ -1,3 +1,4 @@
+import 'package:codestaxh/ai_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,8 +6,6 @@ import 'package:codestaxh/controllers/snippet_controller.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import '../../controllers/team_notifier.dart';
-import '../../views/web/team_management_view.dart';
-import '../../views/shared/profile_view.dart';
 import '../../widgets/notification_bell.dart';
 import 'package:go_router/go_router.dart';
 import 'package:codestaxh/app_router.dart';
@@ -25,6 +24,8 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
   final _titleController = TextEditingController();
   final _codeController = TextEditingController();
   final _tagController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  bool _isGeneratingTags = false;
 
   String? _selectedTeamId;
   String _selectedLanguage = 'Python';
@@ -56,6 +57,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
     _titleController.dispose();
     _codeController.dispose();
     _tagController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -105,6 +107,9 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
                 const SizedBox(height: 24),
                 //code editor
                 _buildCodeEditor(),
+                const SizedBox(height: 24),
+
+                _buildDescriptionField(),
                 const SizedBox(height: 24),
                 //language selector
                 _buildLanguageSelector(),
@@ -308,6 +313,20 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
               label: const Text('Add tag'),
               onPressed: _showAddTagDialog,
             ),
+            const SizedBox(width: 16),
+            //Button to generate tags
+            ActionChip(
+              avatar: _isGeneratingTags
+                  ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+                  : const Icon(Icons.auto_awesome, size: 16),
+              label: Text(_isGeneratingTags ? 'Thinking...' : 'AI Suggest Tags'),
+              backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              onPressed: _isGeneratingTags ? null : _generateTags,
+            ),
           ],
         ),
       ],
@@ -493,6 +512,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
         code: code,
         language: _selectedLanguage,
         tags: _tags,
+        description: _descriptionController.text.trim().isEmpty? null : _descriptionController.text.trim(),
         teamId: _selectedTeamId,
         authorId: FirebaseAuth.instance.currentUser!.uid
       );
@@ -520,6 +540,123 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
         setState(() {
           _isSaving = false;
         });
+      }
+    }
+  }
+
+  Widget _buildDescriptionField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text(
+              'Description',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            Tooltip(
+              message: 'Optional: Add description or generate with AI',
+              child: Icon(
+                Icons.info_outline,
+                size: 16,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _descriptionController,
+          decoration: const InputDecoration(
+            hintText: 'What does this code do?',
+            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.description),
+            helperText: 'Leave empty to generate with AI in detail view',
+          ),
+          maxLines: 3,
+          textInputAction: TextInputAction.newline,
+        ),
+      ],
+    );
+  }
+
+  Future<void> _generateTags() async {
+    final code = _codeController.text.trim();
+
+    if (code.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter some code first'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    final userId = FirebaseAuth.instance.currentUser?.uid ?? 'anonymous';
+    final gemini = AIService();
+
+    if (!gemini.canMakeRequest(userId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Daily limit reached. ${gemini.getRemainingRequests(userId)} requests remaining.'),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isGeneratingTags = true);
+
+    try {
+      final suggestedTags = await gemini.suggestTags(code, _selectedLanguage);
+
+      if (mounted) {
+        setState(() {
+          for (final tag in suggestedTags) {
+            if (!_tags.contains(tag)) {
+              _tags.add(tag);
+            }
+          }
+          _isGeneratingTags = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                      'AI suggested ${suggestedTags.length} tags! ${gemini.getRemainingRequests(userId)}/1500 remaining today'
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isGeneratingTags = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text('Error: ${e.toString()}')),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
       }
     }
   }
