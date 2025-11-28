@@ -34,6 +34,9 @@ class Snippet extends HiveObject {
   @HiveField(9)
   final String?description;
 
+  @HiveField(10)
+  final String? authorId;
+
   Snippet({
     required this.id,
     required this.title,
@@ -45,6 +48,7 @@ class Snippet extends HiveObject {
     required this.dateAdded,
     this.description,
     this.teamId,
+    required this.authorId,
   });
 
   //Snippet to Map for Firestore
@@ -60,6 +64,7 @@ class Snippet extends HiveObject {
       'dateAdded': Timestamp.fromDate(dateAdded), //Firestore needs Timestamp
       'description': description,
       'teamId': teamId,
+      'authorId':authorId,
     };
   }
 
@@ -76,6 +81,7 @@ class Snippet extends HiveObject {
       dateAdded: (map['dateAdded'] as Timestamp).toDate(),
       description: map['description'] as String?,
       teamId: map['teamId'] as String?,
+      authorId: map['authorId'] as String? ?? '', // '' for old snippets with no author during testing
     );
   }
 

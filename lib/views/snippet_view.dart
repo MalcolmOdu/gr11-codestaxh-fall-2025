@@ -18,14 +18,14 @@ class SnippetListView extends ConsumerWidget {
     final filteredSnippets = ref.watch(filteredSnippetsProvider);
     final filterType = ref.watch(snippetFilterProvider);
      
-
-    
+    //Global color scheme
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Stashed Snippets!"),
         toolbarHeight: 200,
-        backgroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -56,8 +56,6 @@ class SnippetListView extends ConsumerWidget {
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       hintText: "Search snippets...",
-                      filled: true,
-                      fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -204,8 +202,7 @@ class SnippetListView extends ConsumerWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
+                              color: colorScheme
                                   .secondary
                                   .withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
@@ -216,8 +213,7 @@ class SnippetListView extends ConsumerWidget {
                                 Icon(
                                   Icons.groups,
                                   size: 14,
-                                  color: Theme.of(context)
-                                      .colorScheme
+                                  color: colorScheme
                                       .secondary,
                                 ),
                                 const SizedBox(width: 4),
@@ -225,8 +221,7 @@ class SnippetListView extends ConsumerWidget {
                                   'Team',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Theme.of(context)
-                                        .colorScheme
+                                    color: colorScheme
                                         .secondary,
                                   ),
                                 ),
@@ -241,8 +236,7 @@ class SnippetListView extends ConsumerWidget {
                     // LANGUAGE BADGE
                     Chip(
                       label: Text(s.language),
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
+                      backgroundColor: colorScheme
                           .primary
                           .withValues(alpha: 0.2),
                     ),
@@ -256,8 +250,7 @@ class SnippetListView extends ConsumerWidget {
                         children: s.tags.take(2).map((t) {
                           return Chip(
                             label: Text(t),
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
+                            backgroundColor: colorScheme
                                 .secondary
                                 .withValues(alpha: 0.2),
                           );
@@ -298,7 +291,7 @@ class SnippetListView extends ConsumerWidget {
                           s.author,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade600,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                       ],

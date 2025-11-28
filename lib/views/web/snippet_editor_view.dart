@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:codestaxh/controllers/snippet_controller.dart';
@@ -497,6 +498,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
         language: _selectedLanguage,
         tags: _tags,
         teamId: _selectedTeamId,
+        authorId: FirebaseAuth.instance.currentUser!.uid
       );
 
       if (mounted) { // Check if widget still exists

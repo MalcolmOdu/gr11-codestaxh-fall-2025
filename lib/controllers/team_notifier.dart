@@ -22,7 +22,7 @@ class TeamNotifier extends Notifier<List<Team>> {
       for (var doc in snapshot.docs) {
         try {
           final team = Team.fromFirestore(doc);
-          if (team.ownerId == user!.uid || team.members.contains(user.uid)) {
+          if (team.ownerId == user.uid || team.members.contains(user.uid)) {
             teams.add(team);
           }
         } catch (e) {
@@ -57,7 +57,7 @@ class TeamNotifier extends Notifier<List<Team>> {
     }
   }
 
-  //Add member to team
+  //Add member to team 
   Future<void> addMember(String teamId, String userEmail) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('User not authenticated');

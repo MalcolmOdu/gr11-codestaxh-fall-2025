@@ -16,6 +16,7 @@ class SnippetController {
     required List<String> tags,
     String? description,
     String? teamId,
+    required String authorId,
   }) async {
     const uuid = Uuid();
     final id = uuid.v4();
@@ -33,6 +34,7 @@ class SnippetController {
       dateAdded: DateTime.now(),
       description: description,
       teamId: teamId,
+      authorId: authorId,
     );
 
     await ref.read(snippetProvider.notifier).add(snippet);
@@ -66,6 +68,7 @@ class SnippetController {
       dateAdded: oldSnippet.dateAdded,
       description: description ?? oldSnippet.description,
       teamId: teamId ?? oldSnippet.teamId,
+      authorId: oldSnippet.authorId,
     );
 
     await ref.read(snippetProvider.notifier).update(id, updatedSnippet);

@@ -19,21 +19,25 @@ class DetailedView extends ConsumerWidget {
     final snippets = ref.watch(snippetProvider);
     final snippet = snippets.firstWhere((s) => s.id == id);
     final controller = SnippetController(ref);
+
+    // global color scheme
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: Colors.lightBlue,
         title: Text("Code Snippet"),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(20),
         child: SizedBox(
           
           width: double.infinity,
           child: Card(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
@@ -51,8 +55,6 @@ class DetailedView extends ConsumerWidget {
                   // LANGUAGE BADGE
                   Chip(
                     label: Text(snippet.language),
-                    backgroundColor:
-                        Colors.blue.shade100,
                   ),
 
                   const SizedBox(height: 6),
@@ -62,7 +64,7 @@ class DetailedView extends ConsumerWidget {
                     width: double.infinity,
                    
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 0, 0, 0),
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(16)
                     ),
                     child:
@@ -78,7 +80,7 @@ class DetailedView extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                                 decoration: BoxDecoration(
                                   
-                                  color: const Color.fromARGB(255, 72, 70, 70),                     // slightly darker bar
+                                  color: colorScheme.secondary,
                                   borderRadius: const BorderRadius.vertical(
                                      top: Radius.circular(8),
                                   
@@ -86,17 +88,17 @@ class DetailedView extends ConsumerWidget {
                                 ),
                                 child: Row(
                                   children: [
-                                 const Text(
+                                 Text(
                                   "Code",
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: colorScheme.onSecondary,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
                                 ),
                                 Spacer(),
                                 IconButton(
-                                  icon: const Icon(Icons.copy, color: Colors.white, size: 20),
+                                  icon: Icon(Icons.copy, color: colorScheme.onSecondary, size: 20),
                                   onPressed: () {
                                     // Copy snippet to clipboard
                                     Clipboard.setData(ClipboardData(text: snippet.code));
@@ -139,14 +141,14 @@ class DetailedView extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black, // important!
+                              color: colorScheme.onSurface
                             ),
                           ),
                           TextSpan(
                             text: snippet.description ?? "No Description",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.black,
+                              color: colorScheme.onSurface.withValues(alpha: 0.8)
                             ),
                           ),
                         ],
@@ -163,8 +165,6 @@ class DetailedView extends ConsumerWidget {
                         children: snippet.tags.map((t) {
                           return Chip(
                             label: Text(t),
-                            backgroundColor:
-                                Colors.green,
                           );
                         }).toList(),
                       ),
@@ -199,14 +199,14 @@ class DetailedView extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black, // important!
+                              color: colorScheme.onSurface
                             ),
                           ),
                           TextSpan(
                             text: snippet.author,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.black,
+                              color: colorScheme.onSurface.withValues(alpha: 0.8)
                             ),
                           ),
                         ],
