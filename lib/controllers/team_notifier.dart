@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/team.dart';
+import '../providers/notification_provider.dart';
 
 class TeamNotifier extends Notifier<List<Team>> {
   final CollectionReference _teamsCollection = FirebaseFirestore.instance.collection('teams');
@@ -22,7 +23,7 @@ class TeamNotifier extends Notifier<List<Team>> {
       for (var doc in snapshot.docs) {
         try {
           final team = Team.fromFirestore(doc);
-          if (team.ownerId == user!.uid || team.members.contains(user.uid)) {
+          if (team.ownerId == user.uid || team.members.contains(user.uid)) {
             teams.add(team);
           }
         } catch (e) {
@@ -57,7 +58,7 @@ class TeamNotifier extends Notifier<List<Team>> {
     }
   }
 
-  //Add member to team
+  //Add member to team 
   Future<void> addMember(String teamId, String userEmail) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('User not authenticated');
@@ -75,6 +76,14 @@ class TeamNotifier extends Notifier<List<Team>> {
     try{
       await _teamsCollection.doc(teamId).update({'members': updatedMembers});
       print('Member $newUserId added to team $teamId');
+
+      // Send notification to new member about joining
+      await NotificationProvider.sendNotification(
+        toUserId: newUserId,
+        title: 'Team Invitation',
+        body: "You've been added to a new team, ${team.name}",
+        iconString: 'invite'
+      );
     } catch (e) {
       print('Error adding member: $e');
       rethrow;
@@ -93,6 +102,14 @@ class TeamNotifier extends Notifier<List<Team>> {
     try {
       await _teamsCollection.doc(teamId).update({'members': updatedMembers});
       print('Member $userId removed from team $teamId');
+
+      // Notify user of removal
+      await NotificationProvider.sendNotification(
+        toUserId: userId,
+        title: 'Removed from Team',
+        body: "You've been removed from: ${team.name}",
+        iconString: 'invite'
+      );
     } catch (e) {
       print('Error removing member: $e');
       rethrow;

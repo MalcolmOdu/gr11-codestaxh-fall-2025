@@ -6,7 +6,6 @@ import '../../widgets/loading_widgets.dart';
 import 'login_view.dart';
 import '../../views/web/snippet_editor_view.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import '../../views/snippet_view.dart';
 
 
 // Allows detect platform, used to determine which screen to use (web vs mobile)

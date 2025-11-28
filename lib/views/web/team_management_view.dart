@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../controllers/team_notifier.dart';
 import '../../widgets/glass_card.dart';
+import '../../widgets/notification_bell.dart';
 
 class TeamManagementView extends ConsumerStatefulWidget {
   const TeamManagementView({super.key});
@@ -52,6 +53,8 @@ class _TeamManagementViewState extends ConsumerState<TeamManagementView> {
       appBar: AppBar(
         title: const Text('Team Management'),
         actions: [
+          const NotificationBell(),
+          const SizedBox(width: 8,),
           if (user != null)
             Padding(
               padding: const EdgeInsets.all(8.0),

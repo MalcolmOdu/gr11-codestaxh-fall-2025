@@ -5,6 +5,7 @@ import '../../providers/auth_provider.dart';
 import '../../theme/theme_provider.dart';
 import '../../controllers/snippet_notifier.dart';
 import '../../widgets/glass_card.dart';
+import '../../widgets/notification_bell.dart';
 import 'package:codestaxh/app_router.dart';
 
 class ProfileView extends ConsumerWidget {
@@ -25,6 +26,14 @@ class ProfileView extends ConsumerWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            // Notifications
+            actions: [
+              const Padding(
+                padding: EdgeInsets.only(right: 8),
+                child: NotificationBell()
+              )
+            ],
+
             expandedHeight: 200,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(

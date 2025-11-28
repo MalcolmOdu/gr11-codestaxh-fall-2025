@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:codestaxh/controllers/snippet_controller.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import '../../controllers/team_notifier.dart';
+import '../../views/web/team_management_view.dart';
+import '../../views/shared/profile_view.dart';
+import '../../widgets/notification_bell.dart';
 import 'package:go_router/go_router.dart';
 import 'package:codestaxh/app_router.dart';
 
@@ -65,6 +69,9 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
             .colorScheme
             .inversePrimary,
         actions: [
+          const NotificationBell(),
+          const SizedBox(width: 8,),
+          
           IconButton(
             icon: const Icon(Icons.groups),
             tooltip: 'Manage Teams',
@@ -487,6 +494,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
         language: _selectedLanguage,
         tags: _tags,
         teamId: _selectedTeamId,
+        authorId: FirebaseAuth.instance.currentUser!.uid
       );
 
       if (mounted) { // Check if widget still exists

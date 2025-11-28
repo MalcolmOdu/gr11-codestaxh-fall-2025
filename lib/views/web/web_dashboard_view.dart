@@ -1,8 +1,14 @@
 import 'package:codestaxh/models/snippet.dart';
+import 'package:codestaxh/providers/notification_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../controllers/snippet_notifier.dart';
+import '../snippet_view.dart';
+import 'snippet_editor_view.dart';
+import '../shared/profile_view.dart';
+import '../detailed_view.dart';
+import 'team_management_view.dart';
 import '../../app_router.dart';
 import 'package:go_router/go_router.dart';
 
@@ -35,7 +41,7 @@ class WebDashboardView extends ConsumerWidget {
         padding: EdgeInsetsGeometry.symmetric(vertical: 20, horizontal: 40),
         child: Column(
           children: [
-            _buildNavBar(context, user),
+            _buildNavBar(context, user, ref),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(16),
@@ -209,11 +215,14 @@ class WebDashboardView extends ConsumerWidget {
   }
   
   // Helper widget, creates nav bar and includes user profile icon and view profile button
-  Widget _buildNavBar(BuildContext context, User? user) {
+  Widget _buildNavBar(BuildContext context, User? user, WidgetRef ref) {
 
     // fetch global theme
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Async notification watcher
+    final notificationsWatcher = ref.watch(notificationStreamProvider);
 
     return Container(
       height: 90,
@@ -237,54 +246,134 @@ class WebDashboardView extends ConsumerWidget {
               ),
             ),
 
-            // Profile button
-            InkWell(
-              onTap: () {
-                context.pushProfile();
-              },
-              child: Row(
-                children: [
-                  Text(
-                    'My Profile',
-                    style: TextStyle(
-                      color: colorScheme.onSurface.withValues(alpha: 0.8)
-                    ),
-                  ),
-                  const SizedBox(width: 20),
+            Row(
+              children: [
 
-                  // Profile icon (from profile_view.dart)
-                  Hero(
-                    tag: 'profile_avatar',
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            spreadRadius: 5,
+                // Notification Bell & Dropdown
+                  // Fetching notifications and badge info with loading and temp error handling
+                notificationsWatcher.when(
+                  loading: () => IconButton(onPressed: (){}, icon: Icon(Icons.notifications_outlined)),
+                  error: (error, stackTrace) => IconButton(
+                    onPressed: (){
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
+                    }, 
+                    icon: Icon(Icons.error)),
+                  data: (data){
+                    // Fetch number of unread notifications to display as badge over icon
+                    final unreadNotifs = data.where((n) => !n.isRead).toList();
+                    // Bell and popup menu for displaying notifications
+                    return PopupMenuButton(
+                      offset: const Offset(0, 50),
+                      tooltip: 'Notifications',
+                      onOpened: (){
+                        if (unreadNotifs.isNotEmpty){
+                          for (final notif in unreadNotifs){
+                            NotificationProvider.markAsRead(user!.uid, notif.id);
+                          }
+                        }
+                      },
+                      icon: Badge(
+                        isLabelVisible: unreadNotifs.isNotEmpty, // Only show badge if unread notifications
+                        label: Text('!'),     // Number of unread displayed
+                        backgroundColor: colorScheme.tertiary,
+                        child: Icon(
+                          unreadNotifs.isNotEmpty ? Icons.notifications_active : Icons.notifications_outlined,
+                          color: colorScheme.onSurface.withValues(alpha: 0.7)
+                        ),
+                      ),
+                      itemBuilder: (context) {
+                        if (data.isEmpty) {
+                          return [
+                            const PopupMenuItem(child: Text('No notifications.'))
+                          ];
+                        }
+                        return data.map((n) {
+                          return PopupMenuItem(
+                            child: ListTile(
+                              leading: Container(
+                                padding: const EdgeInsets.all(8),
+                                child: Icon(n.icon, size: 20, color: n.isRead ? Colors.grey : colorScheme.primary),
+                              ),
+                              title: Text(
+                                n.title,
+                                style: TextStyle(
+                                  fontWeight: n.isRead ? FontWeight.normal :FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              subtitle: Text(
+                                n.body,
+                                style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 14),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: Text(
+                                timeago.format(n.time, locale: 'en_short'), // Time since notification appeared
+                                style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
+                              ),
+                              contentPadding: EdgeInsets.zero,
+                              onTap: (){
+                                // REPLACE WITH ROUTE TO SNIPPET/TEAM
+                                Navigator.pop(context);
+                              },
+                            )
+                          );
+                        }).toList();
+                      },
+                    );
+                  }
+                ),
+
+                // Profile button
+                InkWell(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileView()));
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        'My Profile',
+                        style: TextStyle(
+                          color: colorScheme.onSurface.withValues(alpha: 0.8)
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+
+                      // Profile icon (from profile_view.dart)
+                      Hero(
+                        tag: 'profile_avatar',
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 20,
+                                spreadRadius: 5,
+                              ),
+                            ],
                           ),
-                        ],
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: colorScheme.primary,
+                            backgroundImage: user?.photoURL != null
+                                ? NetworkImage(user!.photoURL!)
+                                : null,
+                            child: user?.photoURL == null
+                                ? Icon(
+                              Icons.person,
+                              size: 50,
+                              color: Theme.of(context).colorScheme.surface,
+                            )
+                                : null,
+                          ),
+                        ),
                       ),
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: colorScheme.primary,
-                        backgroundImage: user?.photoURL != null
-                            ? NetworkImage(user!.photoURL!)
-                            : null,
-                        child: user?.photoURL == null
-                            ? Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Theme.of(context).colorScheme.surface,
-                        )
-                            : null,
-                      ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            )
+                ),
+              ],
+            ),
           ],
         ),
       ),
