@@ -20,143 +20,194 @@ class AuthGate extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
 
     return authState.when(
-      loading: () => Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-              ],
+      loading: () =>
+          Scaffold(
+            body: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Theme
+                        .of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.1),
+                    Theme
+                        .of(context)
+                        .colorScheme
+                        .secondary
+                        .withValues(alpha: 0.1),
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // App Icon
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme
+                                .of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.4),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          'codestaxh-icon.png',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Theme
+                                    .of(context)
+                                    .colorScheme
+                                    .primary,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '</>',
+                                  style: TextStyle(
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme
+                                        .of(context)
+                                        .colorScheme
+                                        .onPrimary,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Loading indicator
+                    const PulsingDots(),
+
+                    const SizedBox(height: 16),
+
+                    Text(
+                      'Loading CodeStaxh...',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(
+                        color: Theme
+                            .of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // App Icon
-              Container(
-              width: 80,
-              height: 80,
+
+      // Error state with retry
+      error: (error, stack) =>
+          Scaffold(
+            body: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                  ),
-                ],
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Theme
+                        .of(context)
+                        .colorScheme
+                        .error
+                        .withValues(alpha: 0.1),
+                    Theme
+                        .of(context)
+                        .colorScheme
+                        .secondary
+                        .withValues(alpha: 0.1),
+                  ],
+                ),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  'codestaxh-icon.png',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(20),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Theme
+                            .of(context)
+                            .colorScheme
+                            .error,
                       ),
-                      child: Center(
-                        child: Text(
-                          '</>',
-                          style: TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onPrimary,
+                      const SizedBox(height: 24),
+                      Text(
+                        'Oops! Something went wrong',
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Unable to connect to authentication service',
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                          color: Theme
+                              .of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.6),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          ref.invalidate(authStateProvider);
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Try Again'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
                           ),
                         ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
               ),
             ),
-                const SizedBox(height: 32),
-
-                // Loading indicator
-                const PulsingDots(),
-
-                const SizedBox(height: 16),
-
-                Text(
-                  'Loading CodeStaxh...',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-              ],
-            ),
           ),
-        ),
-      ),
-
-      // Error state with retry
-      error: (error, stack) => Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
-                Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-              ],
-            ),
-          ),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Oops! Something went wrong',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Unable to connect to authentication service',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      ref.invalidate(authStateProvider);
-                    },
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Try Again'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
 
       // Success state - show login or main app
       data: (user) {
@@ -164,24 +215,12 @@ class AuthGate extends ConsumerWidget {
           return const LoginView();
         }
 
-        try {
-          // Determines which device type the app is launched on
-          final isDesktop = 
-            kIsWeb  // Launched in browser (may be irrelevant depending on how final project is launched)
-            || defaultTargetPlatform == TargetPlatform.macOS    // Desktop view
-            || defaultTargetPlatform == TargetPlatform.windows  // Desktop view
-            || defaultTargetPlatform == TargetPlatform.linux;   // Desktop view
-          
-          if (isDesktop){return const WebDashboardView();}
-          else {return const SnippetEditorView();}
-        }
-        catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: device type could not be resolved.'))
-          );
+        if (kIsWeb) {
           return const SnippetEditorView();
         }
-        
+        else {
+          return const SnippetListView();
+        }
       },
     );
   }

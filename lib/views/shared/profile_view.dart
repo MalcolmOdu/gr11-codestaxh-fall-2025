@@ -6,6 +6,7 @@ import '../../theme/theme_provider.dart';
 import '../../controllers/snippet_notifier.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/notification_bell.dart';
+import 'package:codestaxh/app_router.dart';
 
 class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
@@ -359,6 +360,7 @@ class ProfileView extends ConsumerWidget {
               await ref.read(authServiceProvider).signOut();
               if (context.mounted) {
                 Navigator.of(context).pop();
+                context.signOutAndGoToLogin();
               }
             },
             style: ElevatedButton.styleFrom(
