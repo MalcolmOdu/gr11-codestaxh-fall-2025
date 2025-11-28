@@ -4,8 +4,8 @@ import 'package:codestaxh/controllers/snippet_controller.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import '../../controllers/team_notifier.dart';
-import '../../views/web/team_management_view.dart';
-import '../../views/shared/profile_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:codestaxh/app_router.dart';
 
 class SnippetEditorView extends ConsumerStatefulWidget {
   //if editing existing snippet, pass ID
@@ -69,12 +69,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
             icon: const Icon(Icons.groups),
             tooltip: 'Manage Teams',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const TeamManagementView(),
-                ),
-              );
+              context.pushTeams();
             },
           ),
           const SizedBox(width: 8),
@@ -83,12 +78,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
             icon: const Icon(Icons.person),
             tooltip: 'Profile',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileView(),
-                ),
-              );
+              context.pushProfile();
             },
           ),
 
@@ -511,7 +501,7 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
           ),
         );
 
-        Navigator.of(context).pop();
+        context.go('/dashboard');
       }
     } catch (e) {
       if (mounted) {

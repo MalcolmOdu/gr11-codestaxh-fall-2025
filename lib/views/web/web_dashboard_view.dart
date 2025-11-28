@@ -3,18 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../controllers/snippet_notifier.dart';
-import '../snippet_view.dart';
-import 'snippet_editor_view.dart';
-import '../shared/profile_view.dart';
-import '../detailed_view.dart';
-import '../../theme/app_theme.dart';
+import '../../app_router.dart';
+import 'package:go_router/go_router.dart';
 
 // Display how recent activity is in feed without creating custom DateTime formatting method.
 import 'package:timeago/timeago.dart' as timeago;
 
 /// TODO
 ///   route to team view
-///   repalce placeholder pfps with actual ones in activity list
+///   replace placeholder pfps with actual ones in activity list
 ///   make code snippet wrap around if too large for container
 ///   add dropdown INSIDE search bar to allow search to only look for tags/code content/title/author/etc
 
@@ -89,7 +86,7 @@ class WebDashboardView extends ConsumerWidget {
                           ),
                           onSubmitted: (value) {
                               ref.read(snippetSearchProvider.notifier).state = value;
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const SnippetListView()));
+                              context.goToSnippets();
                           },
                         ),
                       ),
@@ -111,7 +108,7 @@ class WebDashboardView extends ConsumerWidget {
                               color: Colors.blueAccent,
                               title: 'Add Snippet',
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (_) => const SnippetEditorView()));
+                                context.pushEditor();
                               },
                             ),
                           ),
@@ -123,7 +120,7 @@ class WebDashboardView extends ConsumerWidget {
                               color: Colors.green,
                               title: 'Browse Library',
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (_) => const SnippetListView()));
+                                context.push('/snippets');
                               },
                             ),
                           ),
@@ -135,9 +132,7 @@ class WebDashboardView extends ConsumerWidget {
                               color: Colors.purpleAccent,
                               title: 'Manage Teams',
                               onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('not implemented yet')),
-                                );
+                                context.pushTeams();
                               },
                             ),
                           ),
@@ -245,7 +240,7 @@ class WebDashboardView extends ConsumerWidget {
             // Profile button
             InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileView()));
+                context.pushProfile();
               },
               child: Row(
                 children: [
@@ -368,7 +363,7 @@ class _QuickActionCardState extends State<_QuickActionCard> {
                 child: Icon(widget.icon, color: widget.color, size: 28),
               ),
 
-              // Action title (e.g. create snippet, browse livrary)
+              // Action title (e.g. create snippet, browse library)
               const SizedBox(height: 12),
               Text(
                 widget.title,
@@ -408,7 +403,7 @@ class _ActivityListItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-         Navigator.push(context, MaterialPageRoute(builder: (_) => DetailedView(id: snippet.id)));
+         context.pushSnippetDetail(snippet.id);
       },
       borderRadius: BorderRadius.circular(20),
       hoverColor: colorScheme.primary,

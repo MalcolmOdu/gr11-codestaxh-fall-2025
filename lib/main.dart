@@ -1,4 +1,3 @@
-import 'package:codestaxh/views/snippet_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
@@ -9,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_provider.dart';
-import 'views/auth/auth_gate.dart';
+import 'app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,12 +35,15 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'CodeStaxh',
+      debugShowCheckedModeBanner: false,
+
+      routerConfig: appRouter,
+
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      home: const AuthGate(),
     );
   }
 }
