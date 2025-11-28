@@ -5,6 +5,7 @@ import 'package:codestaxh/controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github-dark.dart';
 import 'package:flutter/services.dart';
+import '../widgets/notification_bell.dart';
 
 
 
@@ -26,6 +27,12 @@ class DetailedView extends ConsumerWidget {
     
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 36),
+            child: NotificationBell(),
+          )
+        ],
         toolbarHeight: 80,
         title: Text("Code Snippet"),
       ),

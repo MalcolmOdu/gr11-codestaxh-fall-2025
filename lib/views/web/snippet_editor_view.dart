@@ -7,6 +7,7 @@ import 'package:flutter_highlight/themes/github.dart';
 import '../../controllers/team_notifier.dart';
 import '../../views/web/team_management_view.dart';
 import '../../views/shared/profile_view.dart';
+import '../../widgets/notification_bell.dart';
 
 class SnippetEditorView extends ConsumerStatefulWidget {
   //if editing existing snippet, pass ID
@@ -66,6 +67,9 @@ class _SnippetEditorViewState extends ConsumerState<SnippetEditorView> {
             .colorScheme
             .inversePrimary,
         actions: [
+          const NotificationBell(),
+          const SizedBox(width: 8,),
+          
           IconButton(
             icon: const Icon(Icons.groups),
             tooltip: 'Manage Teams',

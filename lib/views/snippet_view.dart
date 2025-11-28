@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/snippet_controller.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github.dart';
 import 'package:codestaxh/views/detailed_view.dart';
 import '../../views/shared/profile_view.dart';
+import '../widgets/notification_bell.dart';
 
 
 class SnippetListView extends ConsumerWidget {
@@ -27,6 +27,8 @@ class SnippetListView extends ConsumerWidget {
         title: const Text("Stashed Snippets!"),
         toolbarHeight: 200,
         actions: [
+          const NotificationBell(),
+          const SizedBox(width: 8,),
           IconButton(
             icon: const Icon(Icons.person),
             tooltip: 'Profile',
