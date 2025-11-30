@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../models/snippet.dart';
 import 'snippet_notifier.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SnippetController {
   final WidgetRef ref;
 
   SnippetController(this.ref);
+
+  final CollectionReference _snippetsCollection = FirebaseFirestore.instance.collection('snippets');
 
   Future<void> addSnippet({
     required String title,
@@ -37,12 +40,12 @@ class SnippetController {
       authorId: authorId,
     );
 
-    await ref.read(snippetProvider.notifier).add(snippet);
+    await _snippetsCollection.doc(id).set(snippet.toMap());
   }
 
 
   Future<void> removeSnippet(String id) async {
-    await ref.read(snippetProvider.notifier).remove(id);
+    await _snippetsCollection.doc(id).delete();
   }
 
   Future<void> updateSnippet({
@@ -54,7 +57,7 @@ class SnippetController {
     String? description,
     String? teamId,
   }) async {
-    final snippets = ref.read(snippetProvider);
+    final snippets = ref.read(snippetProvider).value ?? [];
     final oldSnippet = snippets.firstWhere((s) => s.id == id);
 
     final updatedSnippet = Snippet(
@@ -71,15 +74,17 @@ class SnippetController {
       authorId: oldSnippet.authorId,
     );
 
-    await ref.read(snippetProvider.notifier).update(id, updatedSnippet);
+    await _snippetsCollection.doc(id).update(updatedSnippet.toMap());
   }
 
 
   Future<void> upvoteSnippet(String id) async {
-    await ref.read(snippetProvider.notifier).upvote(id);
+    await _snippetsCollection.doc(id).update({
+      'upvote': FieldValue.increment(1),
+    });
   }
 
   List<Snippet> getAllSnippets() {
-    return ref.read(snippetProvider);
+    return ref.read(snippetProvider).value ?? [];
   }
 }

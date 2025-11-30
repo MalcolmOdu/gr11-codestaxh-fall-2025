@@ -14,10 +14,11 @@ class ProfileView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = FirebaseAuth.instance.currentUser;
-    final snippets = ref.watch(snippetProvider);
+    final snippetsAsync = ref.watch(snippetProvider);
     final themeMode = ref.watch(themeModeProvider);
 
     // Count user's snippets
+    final snippets = snippetsAsync.value ?? []; // Handle loading state
     final userSnippets = snippets.where(
           (s) => s.author == user?.displayName || s.author == user?.email,
     ).toList();
