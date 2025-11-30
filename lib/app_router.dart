@@ -8,6 +8,7 @@ import 'views/snippet_view.dart';
 import 'views/detailed_view.dart';
 import 'views/auth/login_view.dart';
 import 'views/shared/profile_view.dart';
+import 'views/search_view.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -78,6 +79,12 @@ final appRouter = GoRouter(
       path: '/snippets',
       name: 'snippets',
       builder: (context, state) => const SnippetListView(),
+    ),
+    //created new route for search view
+    GoRoute(
+      path: '/search',
+      name: 'search',
+      builder: (context, state) => const SnippetSearchView(),
     ),
 
     GoRoute(
@@ -153,6 +160,7 @@ extension NavigationHelpers on BuildContext {
   void pushSnippetDetail(String id) => push('/snippet/$id');
   void pushTeams() => push('/teams');
   void pushProfile() => push('/profile');
+  void pushSearch() => push('/search');
 
   void signOutAndGoToLogin() => go('/login');
 }
