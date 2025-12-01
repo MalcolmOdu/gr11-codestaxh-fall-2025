@@ -27,7 +27,8 @@ class WebDashboardView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = FirebaseAuth.instance.currentUser;
-    final snippets = ref.watch(snippetProvider);
+    final snippetsAsync = ref.watch(snippetProvider);
+    final snippets = snippetsAsync.value ?? []; // Handle loading state, add more robust loading indicator later
 
     // Calculate Stats
     final mySnippets = snippets.where((s) => s.author == user?.displayName || s.author == user?.email).toList();

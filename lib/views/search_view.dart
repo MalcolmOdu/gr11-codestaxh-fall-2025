@@ -8,26 +8,72 @@ import 'package:codestaxh/views/detailed_view.dart';
 import '../../views/shared/profile_view.dart';
 import '../widgets/notification_bell.dart';
 import 'package:codestaxh/app_router.dart';
+import 'package:go_router/go_router.dart';
 
+final languages = <String>[
+  'Python',
+  'Java',
+  'Dart',
+  'C++',
+  'JavaScript',
+  'C#',
+  'C',
+  'PHP',
+  'HTML',
+  'CSS',
+  'TypeScript',
+  'Swift',
+  'Objective-C',
+  'SQL',
+  'R',
+  'Ruby',
+  'Go',
+  'Swift',
+  'Kotlin',
+];
 
-class SnippetListView extends ConsumerWidget {
-  const SnippetListView({super.key});
+class SnippetSearchView extends ConsumerStatefulWidget {
+  const SnippetSearchView({super.key});
+  
+  @override
+  ConsumerState<SnippetSearchView> createState() => _SnippetSearchViewState();
+}
+
+class _SnippetSearchViewState extends ConsumerState<SnippetSearchView> {
+  final searchBarController = TextEditingController();
+  final authorController = TextEditingController();
+  String? _selectedLanguage;
+  
+  
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-   
+  Widget build(BuildContext context) {
     final controller = SnippetController(ref);
     final filteredSnippets = ref.watch(filteredSnippetsProvider);
     final filterType = ref.watch(snippetFilterProvider);
     
+     
     //Global color scheme
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Stashed Snippets!"),
-        toolbarHeight: 200,
+        title: const Text("Search Snippets"),
+        toolbarHeight: 400,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back',
+          onPressed: () {
+            ref.invalidate(snippetFilterProvider);
+            ref.invalidate(snippetTagFilterProvider);
+            ref.invalidate(snippetSearchProvider);
+            ref.invalidate(snippetLanguageFilterProvider);
+            ref.invalidate(snippetAuthorFilterProvider);
+            ref.invalidate(snippetSortProvider);
+            context.pop();
+          },
+        ),
         actions: [
           const NotificationBell(),
           const SizedBox(width: 8,),
@@ -52,6 +98,7 @@ class SnippetListView extends ConsumerWidget {
                   Expanded(
                   child:
                   TextField(
+                    controller: searchBarController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       hintText: "Search snippets...",
@@ -61,24 +108,72 @@ class SnippetListView extends ConsumerWidget {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    onChanged: (value){
-                      ref.read(snippetSearchProvider.notifier).state = value;
-                    },
                   ),
                   ),
                   IconButton(
+                    icon: const Icon(Icons.clear),
+                    tooltip: 'Clear Search',
                     onPressed: () {
-                      //resets filters when going to advanced search
-                        ref.invalidate(snippetFilterProvider);
-                        ref.invalidate(snippetTagFilterProvider);
-                        ref.invalidate(snippetSearchProvider);
-                        context.pushSearch();},
-                    icon: Icon(Icons.tune)
-                    )
+                      ref.read(snippetSearchProvider.notifier).state = '';
+                      searchBarController.clear();
+                    },
+                  ),
+                  
                   ]
                 ),
+                const SizedBox(height: 20),
+                 
+                DropdownButton(
+                  hint: const Text("Select Language"),
+                  isExpanded: true ,
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 16,
+                  ),
+                  value: _selectedLanguage,
+                  items:languages.map((lang) {
+                  return DropdownMenuItem<String>(
+                    value: lang,
+                    child: Text(lang),
+                  );
+                }).toList(),
+                  
+                  onChanged:(value){ 
+                    setState(() {
+                      _selectedLanguage = value;
+                    });
+                    }),
 
-          const SizedBox(height: 12),
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                  Expanded(
+                  child:
+                    
+                TextField(
+                    controller: authorController,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: "Filter by author name...",
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                   
+                  ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.clear),
+                    tooltip: 'Clear Search',
+                    onPressed: () {
+                      ref.read(snippetAuthorFilterProvider.notifier).state = {};
+                      authorController.clear();
+                    },
+                  ),
+                  ],
+                ),
 
           // TAG FILTER, add filter implementation here 
           Wrap(
@@ -153,11 +248,52 @@ class SnippetListView extends ConsumerWidget {
                     ),
                   ],
                 ),
+                //Sort buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Text("Sort by: "),
+                    const SizedBox(width: 6),
+                    FilledButton(
+                      
+                      onPressed: () {
+                        // Implement sort by recent
+                        
+                        ref.read(snippetSortProvider.notifier).state = SnippetSortType.recent;
+                      },
+                      child: const Text("Recent"),
+                    ),
+                    const SizedBox(width: 6),
+                    FilledButton(
+                      onPressed: () {
+                        // Implement sort by upvotes
+                        ref.read(snippetSortProvider.notifier).state = SnippetSortType.upvote;
+                      },
+                      child: const Text("Upvotes"),
+                    ),
+                    const SizedBox(width: 6),
+                    FilledButton(
+                      onPressed: () {
+                        // Implement sort by upvotes
+                        ref.read(snippetSortProvider.notifier).state = SnippetSortType.none;
+                      },
+                      child: const Text("Reset"),
+                    ),
+                  ],
+                ),
 
                 const SizedBox(height: 12),
 
               ],
             ),
+            FilledButton(
+              onPressed:() {
+                ref.read(snippetSearchProvider.notifier).state = searchBarController.text;
+                ref.read(snippetAuthorFilterProvider.notifier).state = {authorController.text};
+                ref.read(snippetLanguageFilterProvider.notifier).state = _selectedLanguage != null ? {_selectedLanguage!} : {};
+
+              }, child: const Text('Apply Filters'),
+              )
               ]
           ),
         ),

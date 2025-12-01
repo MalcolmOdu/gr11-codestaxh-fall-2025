@@ -24,7 +24,8 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
 
   @override
   Widget build(BuildContext context) {
-    final snippets = ref.watch(snippetProvider);
+    final snippetsAsync = ref.watch(snippetProvider);
+    final snippets = snippetsAsync.value ?? []; // Handle loading state, add more robust handling later on
     final snippet = snippets.firstWhere((s) => s.id == widget.id);
     final controller = SnippetController(ref);
 
