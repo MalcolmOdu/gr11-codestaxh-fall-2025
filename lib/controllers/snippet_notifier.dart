@@ -177,6 +177,37 @@ final snippetProvider = StreamProvider<List<Snippet>>((ref){
           .map((doc) => Snippet.fromFirestore(doc))   // pass the whole snapshot
           .toList());
 });
+
+//        provider for common tags        //
+//                                        //
+final commonTagsProvider = Provider<Map<String, int>>((ref) {
+  final snippetsAsync = ref.watch(snippetProvider);
+  final snippets = snippetsAsync.value ?? [];
+
+  final Map<String, int> counts = {};
+  
+  for (final snippet in snippets) {
+    for (final tag in snippet.tags) {
+      counts[tag] = (counts[tag] ?? 0) + 1;
+    }
+  }
+
+  return counts;
+});
+//provider for sorted common tags return top 10
+final sortedTagsProvider = Provider<List<String>>((ref) {
+  final counts = ref.watch(commonTagsProvider);
+
+  final entries = counts.entries.toList();
+
+  entries.sort((a, b) => b.value.compareTo(a.value)); // descending
+  final commonTags = entries.map((e) => e.key).take(10).toList();
+  return commonTags;
+  
+});
+//                                        //
+
+
   
 
 // --- UI filtering state ---
