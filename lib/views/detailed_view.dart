@@ -26,6 +26,7 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
   Widget build(BuildContext context) {
     final snippetsAsync = ref.watch(snippetProvider);
     final snippets = snippetsAsync.value ?? []; // Handle loading state, add more robust handling later on
+
     final snippet = snippets.firstWhere((s) => s.id == widget.id);
     final controller = SnippetController(ref);
 
@@ -212,10 +213,14 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                         ),
                     ],
                   ),
-                  Row(
-                    
+                  
+                  Column(
+
                     children: [
-                      
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
                       const SizedBox(width: 4.0),
                       Wrap(
                         spacing: 3,
@@ -225,29 +230,15 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                           );
                         }).toList(),
                       ),
-                      Spacer(),
-                      Row(
-                        
-                        children: [
-                          IconButton(
-                            onPressed: () => controller.upvoteSnippet(snippet.id),
-                            icon: Icon(
-                              Icons.arrow_upward,
-                              size: 30
-                            )
-                            ),
-                          
-                          Text(snippet.upvote.toString(),
-                          style: TextStyle(
-                            fontSize: 20
-                          ),),
-                        ],
-                      
-                      ),
-                      
+                          ],
+                        ),
+                      ),  
 
                      ]
                   ),
+                  Row(
+                        
+                  children: [  
                   RichText(
                       text: TextSpan(
                         children: [
@@ -269,6 +260,22 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                         ],
                       ),
                     ),
+                    Spacer(),
+                    IconButton(
+                        onPressed: () => controller.upvoteSnippet(snippet.id),
+                        icon: Icon(
+                          Icons.arrow_upward,
+                          size: 30
+                          )
+                        ),
+                      
+                      Text(snippet.upvote.toString(),
+                      style: TextStyle(
+                        fontSize: 20
+                        ),
+                      ),
+                  ],
+                  ),
                 ]
               
             )

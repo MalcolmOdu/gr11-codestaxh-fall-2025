@@ -51,6 +51,7 @@ class _SnippetSearchViewState extends ConsumerState<SnippetSearchView> {
     final controller = SnippetController(ref);
     final filteredSnippets = ref.watch(filteredSnippetsProvider);
     final filterType = ref.watch(snippetFilterProvider);
+    final commonTags = ref.watch(sortedTagsProvider);
     
      
     //Global color scheme
@@ -176,11 +177,17 @@ class _SnippetSearchViewState extends ConsumerState<SnippetSearchView> {
                 ),
 
           // TAG FILTER, add filter implementation here 
+          
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final lang in ["Python", "Java", "Dart", "C++"])
+              //Scrollable list of common tags
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+              for (final lang in commonTags)
                 Consumer(
                   builder: (context, ref, _) {
                     final selected = ref.watch(snippetTagFilterProvider).contains(lang);
@@ -205,6 +212,9 @@ class _SnippetSearchViewState extends ConsumerState<SnippetSearchView> {
                     );
                   },
                 ),
+                  ],
+                ),
+              ),
 
                 const SizedBox(height: 12),
 
