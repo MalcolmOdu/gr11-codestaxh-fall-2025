@@ -45,15 +45,17 @@ class Snippet extends HiveObject {
     required this.title,
     required this.code,
     required this.language,
-    required this.tags,
+    List<String>? tags,
     required this.author,
     required this.upvote,
     required this.dateAdded,
     this.description,
     this.teamId,
     required this.authorId,
-    this.upvotedBy = const [],
-  });
+    List<String>? upvotedBy,
+  }) : tags = tags ?? [],
+       upvotedBy = upvotedBy ?? [];
+
 
   //Snippet to Map for Firestore
   Map<String, dynamic> toMap() {
@@ -80,7 +82,7 @@ class Snippet extends HiveObject {
       title: map['title'] as String,
       code: map['code'] as String,
       language: map['language'] as String,
-      tags: List<String>.from(map['tags'] as List),
+      tags: map['tags'] != null ? List<String>.from(map['tags'] as List) : [],
       author: map['author'] as String,
       upvote: map['upvote'] as int,
       dateAdded: (map['dateAdded'] as Timestamp).toDate(),

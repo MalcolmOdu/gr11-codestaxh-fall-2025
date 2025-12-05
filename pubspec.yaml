@@ -25,12 +25,13 @@ dependencies:
   flutter_native_splash: ^2.4.1
   timeago: ^3.7.1
   firebase_messaging: ^15.2.10
+  url_launcher: ^6.3.0
 
 flutter_native_splash:
   color: "#0A0E27"
   image: codestaxh-icon.png
   color_dark: "#0A0E27"
-  image_dark: codestaxh-icon.png
+  image_dark: "codestaxh-icon.png"
 
   android_12:
     color: "#0A0E27"

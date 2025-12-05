@@ -12,6 +12,7 @@ import 'views/search_view.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'views/notifications_view.dart';
+import 'views/welcome_screen.dart';
 
 class AuthNotifier extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -32,7 +33,7 @@ class AuthNotifier extends ChangeNotifier {
 final authNotifier = AuthNotifier();
 
 final appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/welcome',
 
   refreshListenable: authNotifier,
   //Redirect
@@ -52,18 +53,29 @@ final appRouter = GoRouter(
       return '/snippets';
     }
 
+    //DO NOT DELETE, FOR TESTING PURPOSES ONLY
     // if (isWeb && state.matchedLocation == '/snippets') {
     //   return '/dashboard';
     // }
 
-    if (state.matchedLocation == '/'){
-      return user != null ? homeRoute : '/login';
+    // if (state.matchedLocation == '/'){
+    //   return user != null ? homeRoute : '/login';
+    // }
+
+    if (state.matchedLocation == '/' || state.matchedLocation == '/welcome'){
+      return null;
     }
 
     return null;
   },
 
   routes: [
+    GoRoute(
+      path: '/welcome',
+      name: 'welcome',
+      builder: (context, state) => const WelcomeScreen(),
+    ),
+
     GoRoute(
       path: '/login',
       name: 'login',
@@ -151,6 +163,7 @@ final appRouter = GoRouter(
         ],
       )
     )
+  )
 );
 
 extension NavigationHelpers on BuildContext {
