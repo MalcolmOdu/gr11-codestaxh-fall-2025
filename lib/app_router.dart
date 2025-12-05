@@ -11,6 +11,7 @@ import 'views/shared/profile_view.dart';
 import 'views/search_view.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'views/notifications_view.dart';
 
 class AuthNotifier extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -115,6 +116,12 @@ final appRouter = GoRouter(
       path: '/profile',
       name: 'profile',
       builder: (context, state) => const ProfileView(),
+    ),
+
+    GoRoute(
+      path: '/notifications',
+      name: 'notifications',
+      builder: (context, state) => const NotificationsView(),
     ),
   ],
 

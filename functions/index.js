@@ -46,6 +46,9 @@ exports.sendPushNotification = onDocumentCreated('users/{userId}/notifications/{
         return null;
     }
 
+    // Get notification id for marking as read when tapped
+    const notificationId = event.params.notificationId;
+
     // Creating push notification contents
     const message = {
         tokens: tokens,
@@ -55,7 +58,10 @@ exports.sendPushNotification = onDocumentCreated('users/{userId}/notifications/{
         },
         data: {
             click_action: 'FLUTTER_NOTIFICATION_CLICK',
-            path: '/dashboard',
+            icon: notificationData.icon || 'code',
+            path: notificationData.path || '/dashboard',
+            notificationId: notificationId,
+            isUrgent: String(notificationData.isUrgent || 'false'),
         },
         android: {
             priority: 'high',

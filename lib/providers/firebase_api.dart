@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import '../app_router.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -66,6 +65,19 @@ class FirebaseApi {
     
     // Do nothing if no message
     if (message == null) return;
+
+    // mark as read if tapped
+    if (message.data.containsKey('notificationId')) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('notifications')
+          .doc(message.data['notificationId'])
+          .update({'isRead':true});
+      }
+    }
 
     // Routing for when notif is clicked
     if (message.data.containsKey('path')){

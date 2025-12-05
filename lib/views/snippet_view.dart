@@ -5,18 +5,39 @@ import '../controllers/snippet_controller.dart';
 import '../controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github.dart';
-import 'package:codestaxh/views/detailed_view.dart';
-import '../../views/shared/profile_view.dart';
 import '../widgets/notification_bell.dart';
 import 'package:codestaxh/app_router.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 
-class SnippetListView extends ConsumerWidget {
+class SnippetListView extends ConsumerStatefulWidget {
   const SnippetListView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-   
+  ConsumerState<SnippetListView> createState() => _SnippetListViewState();
+}
+
+class _SnippetListViewState extends ConsumerState<SnippetListView>{
+  late TextEditingController _searchController;
+
+  @override
+  void initState(){
+    // Override constructor to allow searches from web dashboard to 
+    // autofill here
+    super.initState();
+    final initialSearch = ref.read(snippetSearchProvider);
+    _searchController = TextEditingController(text: initialSearch);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
     final controller = SnippetController(ref);
     final filteredSnippets = ref.watch(filteredSnippetsProvider);
     final filterType = ref.watch(snippetFilterProvider);
@@ -29,7 +50,15 @@ class SnippetListView extends ConsumerWidget {
       appBar: AppBar(
         title: const Text("Stashed Snippets!"),
         toolbarHeight: 200,
+        automaticallyImplyLeading: !kIsWeb,
         actions: [
+          // home button for web only
+          if (kIsWeb)
+            IconButton(
+              tooltip: 'Dashboard',
+              icon: const Icon(Icons.dashboard),
+              onPressed: () => context.goToDashboard(),
+            ),
           const NotificationBell(),
           const SizedBox(width: 8,),
           IconButton(
@@ -53,6 +82,7 @@ class SnippetListView extends ConsumerWidget {
                   Expanded(
                   child:
                   TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       hintText: "Search snippets...",
@@ -61,9 +91,21 @@ class SnippetListView extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
+                      // clear button
+                      suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            ref.read(snippetSearchProvider.notifier).state ='';
+                            setState((){});
+                          }
+                        )
+                        : null,
                     ),
                     onChanged: (value){
                       ref.read(snippetSearchProvider.notifier).state = value;
+                      setState(() {});
                     },
                   ),
                   ),
@@ -72,7 +114,6 @@ class SnippetListView extends ConsumerWidget {
                       //resets filters when going to advanced search
                         ref.invalidate(snippetFilterProvider);
                         ref.invalidate(snippetTagFilterProvider);
-                        ref.invalidate(snippetSearchProvider);
                         context.pushSearch();},
                     icon: Icon(Icons.tune)
                     )

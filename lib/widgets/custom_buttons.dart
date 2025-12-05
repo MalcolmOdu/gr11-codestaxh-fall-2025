@@ -22,7 +22,7 @@ class NeonButton extends StatefulWidget {
 class _NeonButtonState extends State<NeonButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  bool _isHovered = false;
+  //bool _isHovered = false;
 
   @override
   void initState() {
@@ -43,11 +43,11 @@ class _NeonButtonState extends State<NeonButton>
   Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (_) {
-        setState(() => _isHovered = true);
+        //setState(() => _isHovered = true);
         _controller.forward();
       },
       onExit: (_) {
-        setState(() => _isHovered = false);
+        //setState(() => _isHovered = false);
         _controller.reverse();
       },
       child: AnimatedBuilder(

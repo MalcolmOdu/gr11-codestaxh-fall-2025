@@ -5,7 +5,6 @@ import '../models/snippet.dart';
 import 'snippet_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/notification_provider.dart';
-import 'package:flutter/material.dart';
 
 class SnippetController {
   final WidgetRef ref;
@@ -67,7 +66,8 @@ class SnippetController {
               toUserId: memberId,
               title: 'New Snippet added to $teamName',
               body: '${snippet.author} added ${snippet.title}',
-              iconString: 'code'
+              iconString: 'code',
+              path: '/snippet/${snippet.id}',
             );
           }
         }
@@ -147,6 +147,7 @@ class SnippetController {
           title: 'Snippet Upvoted',
           body: '${currentUser.displayName ?? "Someone"} upvoted "$title"',
           iconString: 'upvote',
+          path: '/snippet/$id',
         );
       }
     }
