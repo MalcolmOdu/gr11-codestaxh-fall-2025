@@ -41,6 +41,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
     final controller = SnippetController(ref);
     final filteredSnippets = ref.watch(filteredSnippetsProvider);
     final filterType = ref.watch(snippetFilterProvider);
+    final commonTags = ref.watch(sortedTagsProvider);
     
     //Global color scheme
     final theme = Theme.of(context);
@@ -127,7 +128,11 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final lang in ["Python", "Java", "Dart", "C++"])
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+              for (final lang in commonTags)
                 Consumer(
                   builder: (context, ref, _) {
                     final selected = ref.watch(snippetTagFilterProvider).contains(lang);
@@ -152,6 +157,9 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
                     );
                   },
                 ),
+                  ],
+                ),  
+              ),
 
                 const SizedBox(height: 12),
 
