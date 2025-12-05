@@ -22,7 +22,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
 
   @override
   void initState(){
-    // Override constructor to allow searches from web dashboard to 
+    // Override constructor to allow searches from web dashboard to
     // autofill here
     super.initState();
     final initialSearch = ref.read(snippetSearchProvider);
@@ -42,7 +42,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
     final filteredSnippets = ref.watch(filteredSnippetsProvider);
     final filterType = ref.watch(snippetFilterProvider);
     final commonTags = ref.watch(sortedTagsProvider);
-    
+
     //Global color scheme
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -123,7 +123,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
 
           const SizedBox(height: 12),
 
-          // TAG FILTER, add filter implementation here 
+          // TAG FILTER, add filter implementation here
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -158,7 +158,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
                   },
                 ),
                   ],
-                ),  
+                ),
               ),
 
                 const SizedBox(height: 12),
@@ -341,7 +341,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
                               onPressed: () => controller.upvoteSnippet(s.id),
                               icon: Icon(
                                 isUpvoted ? Icons.arrow_upward : Icons.arrow_upward_outlined,
-                                color: isUpvoted ? colorScheme.primary : null, 
+                                color: isUpvoted ? colorScheme.primary : null,
                               ),
                             ),
                             Text(

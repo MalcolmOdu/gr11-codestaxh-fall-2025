@@ -7,6 +7,8 @@ import '../../controllers/snippet_notifier.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/notification_bell.dart';
 import 'package:codestaxh/app_router.dart';
+import 'package:codestaxh/widgets/snippet_stats.dart';
+import 'package:codestaxh/widgets/about_dialog.dart';
 
 class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
@@ -32,7 +34,13 @@ class ProfileView extends ConsumerWidget {
               const Padding(
                 padding: EdgeInsets.only(right: 8),
                 child: NotificationBell()
-              )
+              ),
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                tooltip: 'About',
+                onPressed: () => showAppAboutDialog(context),
+              ),
+              const SizedBox(width: 8),
             ],
 
             expandedHeight: 200,
@@ -170,6 +178,17 @@ class ProfileView extends ConsumerWidget {
                   ),
 
                   const SizedBox(height: 24),
+
+                  SnippetStatistics(
+                    snippets: userSnippets,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  RecentActivity(
+                    snippets: userSnippets,
+                    maxItems: 5,
+                  ),
 
                   // Settings Section
                   _buildSectionHeader(context, 'Appearance'),

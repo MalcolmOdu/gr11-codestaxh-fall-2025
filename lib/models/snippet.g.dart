@@ -21,14 +21,14 @@ class SnippetAdapter extends TypeAdapter<Snippet> {
       title: fields[1] as String,
       code: fields[2] as String,
       language: fields[3] as String,
-      tags: (fields[4] as List).cast<String>(),
+      tags: (fields[4] as List?)?.cast<String>(),
       author: fields[5] as String,
       upvote: fields[6] as int,
       dateAdded: fields[7] as DateTime,
       description: fields[9] as String?,
       teamId: fields[8] as String?,
       authorId: fields[10] as String?,
-      upvotedBy: (fields[11] as List).cast<String>(),
+      upvotedBy: (fields[11] as List?)?.cast<String>(),
     );
   }
 
