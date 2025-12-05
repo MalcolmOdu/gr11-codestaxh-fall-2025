@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_api.dart';
 
 //provider that streams the current authentication state
 final authStateProvider = StreamProvider<User?>((ref) {
@@ -59,6 +60,8 @@ class AuthService {
       final userCredential = await _auth.signInWithCredential(credential);
       if (userCredential.user != null) {
         await _createUserProfile(userCredential.user!);
+        // initialize push notifications
+        await FirebaseApi().initNotifications();
       }
 
       return userCredential;

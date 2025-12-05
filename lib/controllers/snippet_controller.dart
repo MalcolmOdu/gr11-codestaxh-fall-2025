@@ -4,6 +4,8 @@ import 'package:uuid/uuid.dart';
 import '../models/snippet.dart';
 import 'snippet_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../providers/notification_provider.dart';
+import 'package:flutter/material.dart';
 
 class SnippetController {
   final WidgetRef ref;
@@ -41,6 +43,39 @@ class SnippetController {
     );
 
     await _snippetsCollection.doc(id).set(snippet.toMap());
+
+    if (teamId != null) {
+      _notifyTeam(snippet);
+    }
+  }
+
+  Future<void> _notifyTeam(Snippet snippet) async {
+    try{
+      // Get team document, used to get team members to notify
+      final teamDoc = await FirebaseFirestore.instance.collection('teams').doc(snippet.teamId).get();
+
+      if (teamDoc.exists){
+        // teammates from teamDoc, lists members or empty list if none/not found
+        final teammates = List<String>.from(teamDoc.data()?['members']??[]);
+        // team name used in notification display
+        final teamName = teamDoc.data()?['name']??'Team name not found';
+
+        // Send notification to team members (except creator)
+        for (final memberId in teammates) {
+          if (memberId != snippet.authorId) {
+            await NotificationProvider.sendNotification(
+              toUserId: memberId,
+              title: 'New Snippet added to $teamName',
+              body: '${snippet.author} added ${snippet.title}',
+              iconString: 'code'
+            );
+          }
+        }
+      }
+    }
+    catch (e) {
+      print('Error notifying team members of post: $e');
+    }
   }
 
 
@@ -79,10 +114,30 @@ class SnippetController {
 
 
   Future<void> upvoteSnippet(String id) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {return;}
+
     await _snippetsCollection.doc(id).update({
-      'upvote': FieldValue.increment(1),
+      'upvote': FieldValue.increment(1)
     });
+
+    final docSnapshot = await _snippetsCollection.doc(id).get();
+    if (!docSnapshot.exists) {return;}
+
+    final snippetData = docSnapshot.data() as Map<String, dynamic>;
+    final authorId = snippetData['authorId'] as String?;
+    final title = snippetData['title'] as String? ?? 'Snippet';
+
+    if (authorId != null && authorId != currentUser.uid) {
+      await NotificationProvider.sendNotification(
+        toUserId: authorId,
+        title: 'Snippet Upvoted!',
+        body: '${currentUser.displayName ?? "Someone"} upvoted your snippet: "$title"',
+        iconString: 'upvote',
+      );
+    }
   }
+  
 
   List<Snippet> getAllSnippets() {
     return ref.read(snippetProvider).value ?? [];

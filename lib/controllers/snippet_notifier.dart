@@ -57,41 +57,8 @@ class SnippetStreamNotifier extends StreamNotifier<List<Snippet>> {
     }
     try {
       await _snippetsCollection.doc(snippet.id).set(snippet.toMap());
-      print('Snippet ${snippet.id} synced to Firestore');
-
-      // If snippet is a team snippet, notify team members 
-      if (snippet.teamId != null) {_notifyTeam(snippet);}
     } catch (e) {
       print('Error syncing to Firestore: $e');
-    }
-  }
-
-  Future<void> _notifyTeam(Snippet snippet) async {
-    try{
-      // Get team document, used to get team members to notify
-      final teamDoc = await FirebaseFirestore.instance.collection('teams').doc(snippet.teamId).get();
-
-      if (teamDoc.exists){
-        // teammates from teamDoc, lists members or empty list if none/not found
-        final teammates = List<String>.from(teamDoc.data()?['members']??[]);
-        // team name used in notification display
-        final teamName = teamDoc.data()?['name']??'Team name not found';
-
-        // Send notification to team members (except creator)
-        for (final memberId in teammates) {
-          if (memberId != snippet.authorId) {
-            await NotificationProvider.sendNotification(
-              toUserId: memberId,
-              title: 'New Snippet added to $teamName',
-              body: '${snippet.author} added ${snippet.title}',
-              iconString: 'code'
-            );
-          }
-        }
-      }
-    }
-    catch (e) {
-      print('Error notifying team members of post: $e');
     }
   }
 
