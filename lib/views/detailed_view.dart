@@ -162,7 +162,7 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                             ),
                           ),
                           const Spacer(),
-                          if (snippet.description == null || snippet.description!.isEmpty)
+                          //if (snippet.description == null || snippet.description!.isEmpty)
                             TextButton.icon(
                               onPressed: _isExplaining ? null : () => _explainCode(snippet),
                               icon: _isExplaining
@@ -174,7 +174,7 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                                   : const Icon(Icons.auto_awesome, size: 18),
                               label: Text(_isExplaining ? 'Thinking...' : 'AI Description'),
                               style: TextButton.styleFrom(
-                                backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                                backgroundColor: colorScheme.primary.withAlpha(25),
                               ),
                             ),
                         ],
@@ -183,10 +183,10 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                       Text(
                         _aiExplanation ??
                             snippet.description ??
-                            "No description. Click ' AI Description ' to generate it.'.",
+                            "No description. Click ' AI Description ' to generate it.",
                         style: TextStyle(
                           fontSize: 14,
-                          color: colorScheme.onSurface.withValues(alpha: 0.8),
+                          color: colorScheme.onSurface.withAlpha(204),
                           fontStyle: (_aiExplanation == null && snippet.description == null)
                               ? FontStyle.italic
                               : FontStyle.normal,
@@ -212,19 +212,20 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                         ),
                     ],
                   ),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: snippet.tags.map((t) {
+                      return Chip(
+                        label: Text(t),
+                      );
+                    }).toList(),
+                  ),
                   Row(
                     
                     children: [
                       
                       const SizedBox(width: 4.0),
-                      Wrap(
-                        spacing: 3,
-                        children: snippet.tags.map((t) {
-                          return Chip(
-                            label: Text(t),
-                          );
-                        }).toList(),
-                      ),
                       Spacer(),
                       Row(
                         
@@ -263,7 +264,7 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                             text: snippet.author,
                             style: TextStyle(
                               fontSize: 14,
-                              color: colorScheme.onSurface.withValues(alpha: 0.8)
+                              color: colorScheme.onSurface.withAlpha(204)
                             ),
                           ),
                         ],
