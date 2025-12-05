@@ -27,7 +27,7 @@ class AuthNotifier extends ChangeNotifier {
   void dispose() {
     _subscription?.cancel();
     super.dispose();
-    }
+  }
 }
 final authNotifier = AuthNotifier();
 
@@ -151,7 +151,6 @@ final appRouter = GoRouter(
         ],
       )
     )
-  )
 );
 
 extension NavigationHelpers on BuildContext {

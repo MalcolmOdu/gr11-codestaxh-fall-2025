@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "CodeStaxh - Stash Code Snippets",
+  "version": "1.0.0",
+  "description": "Save code snippets from any website to your CodeStaxh library",
+
+  "permissions": ["activeTab", "storage", "notifications"],
+
+  "host_permissions": [
+    "https://*.firebaseapp.com/*",
+    "https://*.web.app/*",
+    "https://firestore.googleapis.com/*"
+  ],
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/codestaxh-icon16.png",
+      "48": "icons/codestaxh-icon48.png",
+      "128": "icons/codestaxh-icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/codestaxh-icon16.png",
+    "48": "icons/codestaxh-icon48.png",
+    "128": "icons/codestaxh-icon128.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "*://stackoverflow.com/*",
+        "*://github.com/*",
+        "*://*.github.io/*",
+        "*://developer.mozilla.org/*"
+      ],
+      "js": ["content/content.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "background": {
+    "service_worker": "background/background.js"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
