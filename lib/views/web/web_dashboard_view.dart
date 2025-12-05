@@ -8,15 +8,12 @@ import '../../controllers/snippet_notifier.dart';
 import '../shared/profile_view.dart';
 import '../../app_router.dart';
 import 'package:go_router/go_router.dart';
+import 'package:codestaxh/widgets/about_dialog.dart';
+import 'package:codestaxh/controllers/team_notifier.dart';
 
 // Display how recent activity is in feed without creating custom DateTime formatting method.
 import 'package:timeago/timeago.dart' as timeago;
 
-/// TODO
-///   route to team view
-///   replace placeholder pfps with actual ones in activity list
-///   make code snippet wrap around if too large for container
-///   add dropdown INSIDE search bar to allow search to only look for tags/code content/title/author/etc
 
 class WebDashboardView extends ConsumerWidget {
   const WebDashboardView({super.key});
@@ -26,6 +23,9 @@ class WebDashboardView extends ConsumerWidget {
     final user = FirebaseAuth.instance.currentUser;
     final snippetsAsync = ref.watch(snippetProvider);
     final snippets = snippetsAsync.value ?? []; // Handle loading state, add more robust loading indicator later
+
+    final teams = ref.watch(teamProvider);
+    final myTeamsCount = teams.length; // Count all teams user is in
 
     // Calculate Stats
     final mySnippets = snippets.where((s) => s.author == user?.displayName || s.author == user?.email).toList();
@@ -63,7 +63,7 @@ class WebDashboardView extends ConsumerWidget {
                         children: [
                           _buildStatItem(context, count: mySnippets.length, label: 'Snippets Created'),
                           _buildStatItem(context, count: totalUpvotes, label: 'Upvotes Received'),
-                          _buildStatItem(context, count: 0, label: 'Teams'), // Placeholder for teams
+                          _buildStatItem(context, count: myTeamsCount, label: 'Teams'),
                         ],
                       ),
                       const SizedBox(height: 32),
@@ -236,7 +236,7 @@ class WebDashboardView extends ConsumerWidget {
 
             // App name
             Text(
-              'Codestaxh',
+              'CodeStaxh',
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 40,
@@ -246,6 +246,12 @@ class WebDashboardView extends ConsumerWidget {
 
             Row(
               children: [
+
+                IconButton(
+                  icon: const Icon(Icons.info_outline),
+                  tooltip: 'About',
+                  onPressed: () => showAppAboutDialog(context),
+                ),
 
                 // Notification Bell & Dropdown
                   // Fetching notifications and badge info with loading and temp error handling
