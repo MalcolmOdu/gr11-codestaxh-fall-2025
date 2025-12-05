@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/snippet_controller.dart';
@@ -175,6 +176,8 @@ class SnippetListView extends ConsumerWidget {
         itemBuilder: (context, i) {
           final s = filteredSnippets[i];
           final preview = s.code.split('\n').take(3).join('\n');
+          final user = FirebaseAuth.instance.currentUser;
+          final isUpvoted = user != null && s.upvotedBy.contains(user.uid);
 
           return InkWell(
             onTap: () => context.pushSnippetDetail(s.id),
@@ -286,11 +289,19 @@ class SnippetListView extends ConsumerWidget {
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () =>
-                                  controller.upvoteSnippet(s.id),
-                              icon: const Icon(Icons.arrow_upward),
+                              onPressed: () => controller.upvoteSnippet(s.id),
+                              icon: Icon(
+                                isUpvoted ? Icons.arrow_upward : Icons.arrow_upward_outlined,
+                                color: isUpvoted ? colorScheme.primary : null, 
+                              ),
                             ),
-                            Text(s.upvote.toString()),
+                            Text(
+                              s.upvote.toString(),
+                              style: TextStyle(
+                                fontWeight: isUpvoted ? FontWeight.bold : FontWeight.normal,
+                                color: isUpvoted ? colorScheme.primary : null,
+                              ),
+                            ),
                           ],
                         ),
                         Text(

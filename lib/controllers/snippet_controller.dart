@@ -115,26 +115,40 @@ class SnippetController {
 
   Future<void> upvoteSnippet(String id) async {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {return;}
+    if (currentUser == null) return;
 
-    await _snippetsCollection.doc(id).update({
-      'upvote': FieldValue.increment(1)
-    });
+    final docRef = _snippetsCollection.doc(id);
+    
+    final docSnapshot = await docRef.get();
+    if (!docSnapshot.exists) return;
 
-    final docSnapshot = await _snippetsCollection.doc(id).get();
-    if (!docSnapshot.exists) {return;}
+    final data = docSnapshot.data() as Map<String, dynamic>;
+    final List<String> upvotedBy = List<String>.from(data['upvotedBy'] ?? []);
+    final String? authorId = data['authorId'];
+    final String title = data['title'] ?? 'Snippet';
 
-    final snippetData = docSnapshot.data() as Map<String, dynamic>;
-    final authorId = snippetData['authorId'] as String?;
-    final title = snippetData['title'] as String? ?? 'Snippet';
+    if (upvotedBy.contains(currentUser.uid)) {
+      // already upvoted, remove upvote if tapped
+      await docRef.update({
+        'upvote': FieldValue.increment(-1),
+        'upvotedBy': FieldValue.arrayRemove([currentUser.uid]),
+      });
+    } else {
+      // havent upvoted, add upvote when tapped
+      await docRef.update({
+        'upvote': FieldValue.increment(1),
+        'upvotedBy': FieldValue.arrayUnion([currentUser.uid]),
+      });
 
-    if (authorId != null && authorId != currentUser.uid) {
-      await NotificationProvider.sendNotification(
-        toUserId: authorId,
-        title: 'Snippet Upvoted!',
-        body: '${currentUser.displayName ?? "Someone"} upvoted your snippet: "$title"',
-        iconString: 'upvote',
-      );
+      // send notification only if upvoted
+      if (authorId != null && authorId != currentUser.uid) {
+        await NotificationProvider.sendNotification(
+          toUserId: authorId,
+          title: 'Snippet Upvoted',
+          body: '${currentUser.displayName ?? "Someone"} upvoted "$title"',
+          iconString: 'upvote',
+        );
+      }
     }
   }
   
