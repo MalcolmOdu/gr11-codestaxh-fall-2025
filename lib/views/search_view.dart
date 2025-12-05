@@ -4,8 +4,6 @@ import '../controllers/snippet_controller.dart';
 import '../controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github.dart';
-import 'package:codestaxh/views/detailed_view.dart';
-import '../../views/shared/profile_view.dart';
 import '../widgets/notification_bell.dart';
 import 'package:codestaxh/app_router.dart';
 import 'package:go_router/go_router.dart';
@@ -51,6 +49,7 @@ class _SnippetSearchViewState extends ConsumerState<SnippetSearchView> {
     final controller = SnippetController(ref);
     final filteredSnippets = ref.watch(filteredSnippetsProvider);
     final filterType = ref.watch(snippetFilterProvider);
+    final commonTags = ref.watch(sortedTagsProvider);
     
      
     //Global color scheme
@@ -176,11 +175,17 @@ class _SnippetSearchViewState extends ConsumerState<SnippetSearchView> {
                 ),
 
           // TAG FILTER, add filter implementation here 
+          
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final lang in ["Python", "Java", "Dart", "C++"])
+              //Scrollable list of common tags
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+              for (final lang in commonTags)
                 Consumer(
                   builder: (context, ref, _) {
                     final selected = ref.watch(snippetTagFilterProvider).contains(lang);
@@ -205,6 +210,9 @@ class _SnippetSearchViewState extends ConsumerState<SnippetSearchView> {
                     );
                   },
                 ),
+                  ],
+                ),
+              ),
 
                 const SizedBox(height: 12),
 

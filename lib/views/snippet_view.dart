@@ -1,24 +1,47 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/snippet_controller.dart';
 import '../controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github.dart';
-import 'package:codestaxh/views/detailed_view.dart';
-import '../../views/shared/profile_view.dart';
 import '../widgets/notification_bell.dart';
 import 'package:codestaxh/app_router.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 
-class SnippetListView extends ConsumerWidget {
+class SnippetListView extends ConsumerStatefulWidget {
   const SnippetListView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-   
+  ConsumerState<SnippetListView> createState() => _SnippetListViewState();
+}
+
+class _SnippetListViewState extends ConsumerState<SnippetListView>{
+  late TextEditingController _searchController;
+
+  @override
+  void initState(){
+    // Override constructor to allow searches from web dashboard to 
+    // autofill here
+    super.initState();
+    final initialSearch = ref.read(snippetSearchProvider);
+    _searchController = TextEditingController(text: initialSearch);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
     final controller = SnippetController(ref);
     final filteredSnippets = ref.watch(filteredSnippetsProvider);
     final filterType = ref.watch(snippetFilterProvider);
+    final commonTags = ref.watch(sortedTagsProvider);
     
     //Global color scheme
     final theme = Theme.of(context);
@@ -28,7 +51,15 @@ class SnippetListView extends ConsumerWidget {
       appBar: AppBar(
         title: const Text("Stashed Snippets!"),
         toolbarHeight: 200,
+        automaticallyImplyLeading: !kIsWeb,
         actions: [
+          // home button for web only
+          if (kIsWeb)
+            IconButton(
+              tooltip: 'Dashboard',
+              icon: const Icon(Icons.dashboard),
+              onPressed: () => context.goToDashboard(),
+            ),
           const NotificationBell(),
           const SizedBox(width: 8,),
           IconButton(
@@ -52,6 +83,7 @@ class SnippetListView extends ConsumerWidget {
                   Expanded(
                   child:
                   TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       hintText: "Search snippets...",
@@ -60,9 +92,21 @@ class SnippetListView extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
+                      // clear button
+                      suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            ref.read(snippetSearchProvider.notifier).state ='';
+                            setState((){});
+                          }
+                        )
+                        : null,
                     ),
                     onChanged: (value){
                       ref.read(snippetSearchProvider.notifier).state = value;
+                      setState(() {});
                     },
                   ),
                   ),
@@ -71,7 +115,6 @@ class SnippetListView extends ConsumerWidget {
                       //resets filters when going to advanced search
                         ref.invalidate(snippetFilterProvider);
                         ref.invalidate(snippetTagFilterProvider);
-                        ref.invalidate(snippetSearchProvider);
                         context.pushSearch();},
                     icon: Icon(Icons.tune)
                     )
@@ -85,7 +128,11 @@ class SnippetListView extends ConsumerWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final lang in ["Python", "Java", "Dart", "C++"])
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+              for (final lang in commonTags)
                 Consumer(
                   builder: (context, ref, _) {
                     final selected = ref.watch(snippetTagFilterProvider).contains(lang);
@@ -110,6 +157,9 @@ class SnippetListView extends ConsumerWidget {
                     );
                   },
                 ),
+                  ],
+                ),  
+              ),
 
                 const SizedBox(height: 12),
 
@@ -175,6 +225,8 @@ class SnippetListView extends ConsumerWidget {
         itemBuilder: (context, i) {
           final s = filteredSnippets[i];
           final preview = s.code.split('\n').take(3).join('\n');
+          final user = FirebaseAuth.instance.currentUser;
+          final isUpvoted = user != null && s.upvotedBy.contains(user.uid);
 
           return InkWell(
             onTap: () => context.pushSnippetDetail(s.id),
@@ -286,11 +338,19 @@ class SnippetListView extends ConsumerWidget {
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () =>
-                                  controller.upvoteSnippet(s.id),
-                              icon: const Icon(Icons.arrow_upward),
+                              onPressed: () => controller.upvoteSnippet(s.id),
+                              icon: Icon(
+                                isUpvoted ? Icons.arrow_upward : Icons.arrow_upward_outlined,
+                                color: isUpvoted ? colorScheme.primary : null, 
+                              ),
                             ),
-                            Text(s.upvote.toString()),
+                            Text(
+                              s.upvote.toString(),
+                              style: TextStyle(
+                                fontWeight: isUpvoted ? FontWeight.bold : FontWeight.normal,
+                                color: isUpvoted ? colorScheme.primary : null,
+                              ),
+                            ),
                           ],
                         ),
                         Text(

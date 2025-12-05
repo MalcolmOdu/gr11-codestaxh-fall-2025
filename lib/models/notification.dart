@@ -11,6 +11,8 @@ class AppNotification {
   final IconData icon;  // e.g. team icon, code icon, upvote icon
   final bool isRead;  
   final DateTime time;
+  final String? route; // Used for routing to detailed view when notif is tapped
+  final bool isUrgent; // Determines whether bell icon displays red '!'
 
   AppNotification({
     required this.id,
@@ -19,6 +21,8 @@ class AppNotification {
     required this.icon,
     this.isRead = false,
     required this.time,
+    this.route,
+    this.isUrgent = false,
   });
 
   factory AppNotification.fromFirestore(DocumentSnapshot doc) {
@@ -26,7 +30,7 @@ class AppNotification {
 
     // IconData does not work well with Firebase. Store String and use to determine icon in code
     // (keep IconData field for gui, use String for firebase)
-    final String type = data['type'] ?? 'info';
+    final String type = data['icon'] ?? 'info';
     
     IconData resolvedIcon;
     switch (type) {
@@ -51,6 +55,8 @@ class AppNotification {
       icon: resolvedIcon, // Convert string to icon
       isRead: data['isRead'] ?? false,
       time: (data['time'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      route: data['path'],
+      isUrgent: data['isUrgent'] ?? false,
     );
   }
 }

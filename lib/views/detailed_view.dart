@@ -26,8 +26,12 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
   Widget build(BuildContext context) {
     final snippetsAsync = ref.watch(snippetProvider);
     final snippets = snippetsAsync.value ?? []; // Handle loading state, add more robust handling later on
+
     final snippet = snippets.firstWhere((s) => s.id == widget.id);
     final controller = SnippetController(ref);
+
+    final user = FirebaseAuth.instance.currentUser;
+    final isUpvoted = user != null && snippet.upvotedBy.contains(user.uid);
 
     // global color scheme
     final theme = Theme.of(context);
@@ -224,31 +228,42 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                   Row(
                     
                     children: [
-                      
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
                       const SizedBox(width: 4.0),
                       Spacer(),
                       Row(
-                        
                         children: [
                           IconButton(
                             onPressed: () => controller.upvoteSnippet(snippet.id),
                             icon: Icon(
-                              Icons.arrow_upward,
-                              size: 30
+                              // Filled if upvoted, outlined if not
+                              isUpvoted ? Icons.arrow_upward : Icons.arrow_upward_outlined,
+                              size: 30,
+                              // Primary color if upvoted
+                              color: isUpvoted ? colorScheme.primary : null, 
                             )
-                            ),
+                          ),
                           
-                          Text(snippet.upvote.toString(),
-                          style: TextStyle(
-                            fontSize: 20
-                          ),),
+                          Text(
+                            snippet.upvote.toString(),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: isUpvoted ? FontWeight.bold : FontWeight.normal,
+                              color: isUpvoted ? colorScheme.primary : null,
+                            ),
+                          ),
                         ],
-                      
                       ),
                       
 
                      ]
                   ),
+                  Row(
+                        
+                  children: [  
                   RichText(
                       text: TextSpan(
                         children: [
@@ -270,6 +285,22 @@ class _DetailedViewState extends ConsumerState<DetailedView> {
                         ],
                       ),
                     ),
+                    Spacer(),
+                    IconButton(
+                        onPressed: () => controller.upvoteSnippet(snippet.id),
+                        icon: Icon(
+                          Icons.arrow_upward,
+                          size: 30
+                          )
+                        ),
+                      
+                      Text(snippet.upvote.toString(),
+                      style: TextStyle(
+                        fontSize: 20
+                        ),
+                      ),
+                  ],
+                  ),
                 ]
               
             )

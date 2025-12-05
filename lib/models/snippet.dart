@@ -37,6 +37,9 @@ class Snippet extends HiveObject {
   @HiveField(10)
   final String? authorId;
 
+  @HiveField(11)
+  final List<String> upvotedBy;
+
   Snippet({
     required this.id,
     required this.title,
@@ -49,6 +52,7 @@ class Snippet extends HiveObject {
     this.description,
     this.teamId,
     required this.authorId,
+    this.upvotedBy = const [],
   });
 
   //Snippet to Map for Firestore
@@ -65,6 +69,7 @@ class Snippet extends HiveObject {
       'description': description,
       'teamId': teamId,
       'authorId':authorId,
+      'upvotedBy': upvotedBy,
     };
   }
 
@@ -82,6 +87,7 @@ class Snippet extends HiveObject {
       description: map['description'] as String?,
       teamId: map['teamId'] as String?,
       authorId: map['authorId'] as String? ?? '', // '' for old snippets with no author during testing
+      upvotedBy: List<String>.from(map['upvotedBy'] ?? []),
     );
   }
 

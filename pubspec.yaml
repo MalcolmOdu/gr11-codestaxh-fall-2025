@@ -24,6 +24,7 @@ dependencies:
   google_sign_in: ^6.2.2
   flutter_native_splash: ^2.4.1
   timeago: ^3.7.1
+  firebase_messaging: ^15.2.10
 
 flutter_native_splash:
   color: "#0A0E27"

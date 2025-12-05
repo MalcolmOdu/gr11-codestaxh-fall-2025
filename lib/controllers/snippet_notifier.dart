@@ -57,41 +57,8 @@ class SnippetStreamNotifier extends StreamNotifier<List<Snippet>> {
     }
     try {
       await _snippetsCollection.doc(snippet.id).set(snippet.toMap());
-      print('Snippet ${snippet.id} synced to Firestore');
-
-      // If snippet is a team snippet, notify team members 
-      if (snippet.teamId != null) {_notifyTeam(snippet);}
     } catch (e) {
       print('Error syncing to Firestore: $e');
-    }
-  }
-
-  Future<void> _notifyTeam(Snippet snippet) async {
-    try{
-      // Get team document, used to get team members to notify
-      final teamDoc = await FirebaseFirestore.instance.collection('teams').doc(snippet.teamId).get();
-
-      if (teamDoc.exists){
-        // teammates from teamDoc, lists members or empty list if none/not found
-        final teammates = List<String>.from(teamDoc.data()?['members']??[]);
-        // team name used in notification display
-        final teamName = teamDoc.data()?['name']??'Team name not found';
-
-        // Send notification to team members (except creator)
-        for (final memberId in teammates) {
-          if (memberId != snippet.authorId) {
-            await NotificationProvider.sendNotification(
-              toUserId: memberId,
-              title: 'New Snippet added to $teamName',
-              body: '${snippet.author} added ${snippet.title}',
-              iconString: 'code'
-            );
-          }
-        }
-      }
-    }
-    catch (e) {
-      print('Error notifying team members of post: $e');
     }
   }
 
@@ -177,6 +144,37 @@ final snippetProvider = StreamProvider<List<Snippet>>((ref){
           .map((doc) => Snippet.fromFirestore(doc))   // pass the whole snapshot
           .toList());
 });
+
+//        provider for common tags        //
+//                                        //
+final commonTagsProvider = Provider<Map<String, int>>((ref) {
+  final snippetsAsync = ref.watch(snippetProvider);
+  final snippets = snippetsAsync.value ?? [];
+
+  final Map<String, int> counts = {};
+  
+  for (final snippet in snippets) {
+    for (final tag in snippet.tags) {
+      counts[tag] = (counts[tag] ?? 0) + 1;
+    }
+  }
+
+  return counts;
+});
+//provider for sorted common tags return top 10
+final sortedTagsProvider = Provider<List<String>>((ref) {
+  final counts = ref.watch(commonTagsProvider);
+
+  final entries = counts.entries.toList();
+
+  entries.sort((a, b) => b.value.compareTo(a.value)); // descending
+  final commonTags = entries.map((e) => e.key).take(10).toList();
+  return commonTags;
+  
+});
+//                                        //
+
+
   
 
 // --- UI filtering state ---

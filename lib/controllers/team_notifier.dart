@@ -59,7 +59,8 @@ class TeamNotifier extends Notifier<List<Team>> {
   }
 
   //Add member to team 
-  Future<void> addMember(String teamId, String userEmail) async {
+  Future<void> addMember(String teamId, String userEmailUnformatted) async {
+    final userEmail = userEmailUnformatted.toLowerCase();
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('User not authenticated');
 
@@ -82,7 +83,8 @@ class TeamNotifier extends Notifier<List<Team>> {
         toUserId: newUserId,
         title: 'Team Invitation',
         body: "You've been added to a new team, ${team.name}",
-        iconString: 'invite'
+        iconString: 'invite',
+        path: '/teams',
       );
     } catch (e) {
       print('Error adding member: $e');
@@ -108,7 +110,8 @@ class TeamNotifier extends Notifier<List<Team>> {
         toUserId: userId,
         title: 'Removed from Team',
         body: "You've been removed from: ${team.name}",
-        iconString: 'invite'
+        iconString: 'invite',
+        path: '/teams',
       );
     } catch (e) {
       print('Error removing member: $e');
