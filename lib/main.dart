@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_provider.dart';
 import 'app_router.dart';
+import 'providers/firebase_api.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +18,9 @@ void main() async {
   );
 
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
+
+  // Initialize FCM for push notifications
+  await FirebaseApi().initNotifications();
 
 
   if(!kIsWeb){

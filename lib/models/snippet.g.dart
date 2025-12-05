@@ -28,13 +28,14 @@ class SnippetAdapter extends TypeAdapter<Snippet> {
       description: fields[9] as String?,
       teamId: fields[8] as String?,
       authorId: fields[10] as String?,
+      upvotedBy: (fields[11] as List).cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Snippet obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class SnippetAdapter extends TypeAdapter<Snippet> {
       ..writeByte(9)
       ..write(obj.description)
       ..writeByte(10)
-      ..write(obj.authorId);
+      ..write(obj.authorId)
+      ..writeByte(11)
+      ..write(obj.upvotedBy);
   }
 
   @override

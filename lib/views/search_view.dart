@@ -4,8 +4,6 @@ import '../controllers/snippet_controller.dart';
 import '../controllers/snippet_notifier.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github.dart';
-import 'package:codestaxh/views/detailed_view.dart';
-import '../../views/shared/profile_view.dart';
 import '../widgets/notification_bell.dart';
 import 'package:codestaxh/app_router.dart';
 import 'package:go_router/go_router.dart';
