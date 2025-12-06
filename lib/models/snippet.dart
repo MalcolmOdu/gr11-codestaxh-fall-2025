@@ -2,6 +2,11 @@ import 'package:hive/hive.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 part 'snippet.g.dart';
 
+/// This class provides a model for a snippet that is usable for both
+/// local and cloud storage, which allows snippets to be saved and accessed 
+/// locally when a user may not have internet connection on their mobile device
+/// (ex. coding workshop event).
+
 @HiveType(typeId: 1) //Unique ID for this model
 class Snippet extends HiveObject {
   @HiveField(0)

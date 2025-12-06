@@ -4,7 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../widgets/glitch_text.dart';
 
-
+/// Welcome screen shown when the app is launched. Displays a simple
+/// well-designed logo & animated loading screen while the app initializes.
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 

@@ -5,6 +5,7 @@ import 'package:codestaxh/providers/auth_provider.dart';
 import 'package:codestaxh/widgets/custom_buttons.dart';
 import 'package:codestaxh/theme/app_animation.dart';
 
+/// View for users to sign up with email & password
 class SignUpView extends ConsumerStatefulWidget {
   const SignUpView({super.key});
 

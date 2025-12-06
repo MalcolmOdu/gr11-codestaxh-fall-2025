@@ -9,6 +9,8 @@ import '../widgets/notification_bell.dart';
 import 'package:codestaxh/ai_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+/// Provides a detailed view of a snippet, includes all content of a snippet (tags,
+/// language, author, upvotes, etc)
 class DetailedView extends ConsumerStatefulWidget {
   final String? id;
   const DetailedView({super.key, this.id});

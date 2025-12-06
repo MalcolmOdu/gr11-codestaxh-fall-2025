@@ -5,8 +5,11 @@ import 'package:codestaxh/providers/notification_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// This class is essentially just a copy past re-usable version of the notification
-/// implementation in views/web/web_dashboard_view.dart
+/// This class provides a notification bell widget used in appbars when the user is signed in.
+/// It alerts the user if there are any unread notifications. 
+/// 
+/// The GUI for this class includes buttons to mark notifications as read as well as
+/// access a view containing all notifications.
 class NotificationBell extends ConsumerWidget {
   const NotificationBell({super.key});
 
@@ -77,6 +80,7 @@ class NotificationBell extends ConsumerWidget {
               return menuItems;
             }
 
+            // Adding the actual notifications to the dropdown
             for (var n in displayList) {
               menuItems.add(
                 PopupMenuItem(
@@ -143,6 +147,8 @@ class NotificationBell extends ConsumerWidget {
                 )
               );
             }
+            // If more than 10 unread notifications in dropdown, show user
+            // how many unread notifications aren't being shown.
             if (remainingCount > 0) {
               menuItems.add(
                 PopupMenuItem(
@@ -162,6 +168,8 @@ class NotificationBell extends ConsumerWidget {
               );
             }
             menuItems.add(const PopupMenuDivider());
+            
+            // Mark as read button
             menuItems.add(
               PopupMenuItem(
                 child: Center(

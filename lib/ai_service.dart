@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+/// This class is used to provide quick and concise AI descriptions of code snippets.
 class AIService {
   static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY', defaultValue: 'AIzaSyDvQXOR2OeQiIoRpeVOO0NcP70YwEbuuQ8');
   static const String _apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
@@ -20,8 +21,6 @@ class AIService {
   static final AIService _instance = AIService._internal();
   factory AIService() => _instance;
   AIService._internal();
-
-  // ========== PUBLIC METHODS ==========
 
   // Generate tags for code snippet
   Future<List<String>> suggestTags(String code, String language) async {

@@ -6,6 +6,8 @@ import '../../controllers/team_notifier.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/notification_bell.dart';
 
+/// This view allows users to create/delete teams and add/remove members.
+/// Users can also use it to view all teams they're a part of, whether leader or not.
 class TeamManagementView extends ConsumerStatefulWidget {
   const TeamManagementView({super.key});
 
@@ -37,7 +39,7 @@ class _TeamManagementViewState extends ConsumerState<TeamManagementView> {
         return displayName;
       }
     } catch (e) {
-      print('Error fetching user: $e');
+      return '';
     }
 
     _userNameCache[userId] = 'Unknown User';
@@ -184,7 +186,7 @@ class _TeamManagementViewState extends ConsumerState<TeamManagementView> {
 
                   const Divider(height: 32),
 
-                  // MEMBERS SECTION
+                  // Displays members
                   Row(
                     children: [
                       Icon(

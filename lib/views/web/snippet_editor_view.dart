@@ -10,6 +10,8 @@ import '../../widgets/notification_bell.dart';
 import 'package:go_router/go_router.dart';
 import 'package:codestaxh/app_router.dart';
 
+/// This view allows users to edit their own snippets and is only accessible
+/// by the user who created the snippet.
 class SnippetEditorView extends ConsumerStatefulWidget {
   //if editing existing snippet, pass ID
   final String? id;
