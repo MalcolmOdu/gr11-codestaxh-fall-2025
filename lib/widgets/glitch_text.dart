@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-
+// Used in welcome screen, provides content for animated loading.
 class GlitchText extends StatefulWidget {
   final String text;
   final TextStyle? style;

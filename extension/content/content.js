@@ -136,8 +136,14 @@ function saveSnippet(code, language) {
     action: 'stashSnippet',
     code: code,
     language: language,
-    url: window.location.href,
+    sourceUrl: window.location.href,
+    sourceTitle:document.title, // add page title
   }, (response) => {
+    if (chrome.runtime.lastError){
+      console.warn('CodeStaxh message error: ', chrome.runtime.lastError.message);
+      return;
+    }
+
     if (response && response.success) {
       console.log('Stashed to CodeStaxh!');
     } else {

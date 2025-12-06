@@ -4,11 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../app_router.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-
-/// This class 
-
-// Handles notifs when app is closed. Uses @pragma('vm:entry-point')
-// to ensure it is never removed during tree shaking.
+// This class handles notifs when app is closed. Uses @pragma('vm:entry-point')
+// to ensure it is never removed during tree shaking (i.e. works when app is terminated).
 // https://www.youtube.com/shorts/67wsfPCsVkA
 @pragma('vm:entry-point')
 Future<void> handleBackgroundMessage(RemoteMessage message) async{
@@ -33,8 +30,6 @@ class FirebaseApi {
 
     // Save token to firestore
     if (fcmToken != null) {
-      //DEBUG
-      print('FCM Token: $fcmToken');
 
       //ensures token saved on signin
       FirebaseAuth.instance.authStateChanges().listen((user) {
@@ -88,6 +83,9 @@ class FirebaseApi {
     }
   }
 
+  // Handles push notifications for different states of the app. Does not
+  // handle push notifications when app is opened and actively being used,
+  // since that is handled by notificationBell.
   Future initPushNotifications() async {
     // handles notif if received while app closed and then app is opened 
     //  normally instead of clicking notification
@@ -98,11 +96,5 @@ class FirebaseApi {
 
     // Handle notif if app is running in background/system tray
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
-
-    // NOTE can also add handle for when app is already opened but
-    //  can also just leave that to the bell icon. If implementing,
-    //  use snackbar to notify.
-
-    
   }
 }

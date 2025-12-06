@@ -11,6 +11,8 @@ import 'theme/theme_provider.dart';
 import 'app_router.dart';
 import 'providers/firebase_api.dart';
 
+/// Entry point of the app. Initializes hive storage, firebase, color theme,
+/// push notifications, and app router.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(

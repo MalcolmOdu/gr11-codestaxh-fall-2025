@@ -5,6 +5,8 @@ import 'package:codestaxh/widgets/custom_buttons.dart';
 import 'package:codestaxh/theme/app_animation.dart';
 import 'signup_view.dart';
 
+/// View for users to log in to the app. Allows login via email and password,
+/// google, and github. Includes option to create an account and forgot password.
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
 

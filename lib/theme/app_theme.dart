@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// This class includes all data related to color theming of the app.
 class AppTheme {
   // Neon blue colour palette
   static const Color neonBlue = Color(0xFF00D9FF);

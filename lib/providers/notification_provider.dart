@@ -5,6 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/notification.dart';
 import 'auth_provider.dart';
 
+/// NotificationProvider handles client-side notification operations (sending and
+/// managing notifications). Push notifications are handled by cloud functions 
+/// and in-app notifications are handled by notification functions listening for
+/// updates to a users notification collection in the Firebase database, which are
+/// tagged with an "isRead" boolean.
 final notificationStreamProvider = StreamProvider<List<AppNotification>>((ref) {
   
   final user = FirebaseAuth.instance.currentUser;
@@ -52,7 +57,7 @@ class NotificationProvider {
         'isUrgent':isUrgent,
       });
     } catch (e) {
-      debugPrint('Error sending notification: $e');
+      return;
     }
   }
 

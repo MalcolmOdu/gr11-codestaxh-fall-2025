@@ -5,6 +5,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_api.dart';
 
+/// This file is used to monitor the auth state of a user and ensure
+/// users are only able to access features that are allowed to their account.
+
+
 //provider that streams the current authentication state
 final authStateProvider = StreamProvider<User?>((ref) {
   return FirebaseAuth.instance.authStateChanges();
@@ -27,7 +31,6 @@ class AuthService {
       final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
       final docSnapshot = await userDoc.get();
       if (docSnapshot.exists) {
-        print('User profile already exists');
         return;
       }
       await userDoc.set({
@@ -37,9 +40,7 @@ class AuthService {
         'photoURL': user.photoURL,
         'createdAt': FieldValue.serverTimestamp(),
       });
-      print('User profile created for ${user.email}');
     } catch (e) {
-      print('Error creating user profile: $e');
     }
   }
 
@@ -66,7 +67,6 @@ class AuthService {
 
       return userCredential;
     } catch (e) {
-      print('Error signing in with Google: $e');
       rethrow;
     }
   }
@@ -90,7 +90,6 @@ class AuthService {
 
       return userCredential;
     } catch (e) {
-      print('Error signing in with Github: $e');
       rethrow;
     }
   }
@@ -103,7 +102,6 @@ class AuthService {
       await _createUserProfile(userCredential.user!);
       return userCredential;
     } catch (e) {
-      print('Error signing up with email: $e');
       rethrow;
     }
   }
@@ -116,7 +114,6 @@ class AuthService {
       }
       return userCredential;
     } catch (e) {
-      print('Error signing in with email: $e');
       rethrow;
     }
   }
@@ -126,7 +123,6 @@ class AuthService {
     try{
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      print('Error sending password reset email: $e');
       rethrow;
     }
   }
@@ -135,7 +131,6 @@ class AuthService {
     try{
       await Future.wait([_auth.signOut(), _googleSignIn.signOut()]);
     } catch (e) {
-      print('Error signing out:');
       rethrow;
     }
   }

@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// This class provides a model for a team object. It includes
+/// the team id, name, owner, list of members, and date created.
+/// Functionality for disassembling and reassembling for firebase
+/// functions are handled within this class.
 class Team {
   final String id;
   final String name;

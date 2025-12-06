@@ -4,6 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/team.dart';
 import '../providers/notification_provider.dart';
 
+/// This class is a notifier to other classes which provides updates
+/// when changes are made to teams. For example, if a user is viewing their dashboard filtered
+/// by team and is invited to a team, then a snippet is posted to that team, the snippet would appear
+/// in their filtered dashboard view. 
+/// 
+/// This class also triggers a notification to be sent to a user when they are added/removed from a team. 
 class TeamNotifier extends Notifier<List<Team>> {
   final CollectionReference _teamsCollection = FirebaseFirestore.instance.collection('teams');
 
@@ -27,12 +33,11 @@ class TeamNotifier extends Notifier<List<Team>> {
             teams.add(team);
           }
         } catch (e) {
-          print('Error parsing team: ${doc.id}: $e');
+          return;
         }
       }
       state = teams;
     }, onError: (error) {
-      print('Error listening to teams: $error');
     });
   }
 
@@ -51,9 +56,7 @@ class TeamNotifier extends Notifier<List<Team>> {
     );
     try {
       await _teamsCollection.doc(teamId).set(team.toMap());
-      print('Team $teamId created');
     } catch (e) {
-      print('Error creating team: $e');
       rethrow;
     }
   }
@@ -76,7 +79,6 @@ class TeamNotifier extends Notifier<List<Team>> {
     final updatedMembers = [...team.members, newUserId];
     try{
       await _teamsCollection.doc(teamId).update({'members': updatedMembers});
-      print('Member $newUserId added to team $teamId');
 
       // Send notification to new member about joining
       await NotificationProvider.sendNotification(
@@ -87,7 +89,6 @@ class TeamNotifier extends Notifier<List<Team>> {
         path: '/teams',
       );
     } catch (e) {
-      print('Error adding member: $e');
       rethrow;
     }
   }
@@ -103,7 +104,6 @@ class TeamNotifier extends Notifier<List<Team>> {
     final updatedMembers = team.members.where((m) => m != userId).toList();
     try {
       await _teamsCollection.doc(teamId).update({'members': updatedMembers});
-      print('Member $userId removed from team $teamId');
 
       // Notify user of removal
       await NotificationProvider.sendNotification(
@@ -114,7 +114,6 @@ class TeamNotifier extends Notifier<List<Team>> {
         path: '/teams',
       );
     } catch (e) {
-      print('Error removing member: $e');
       rethrow;
     }
   }
@@ -129,9 +128,7 @@ class TeamNotifier extends Notifier<List<Team>> {
 
     try {
       await _teamsCollection.doc(teamId).delete();
-      print('Team $teamId deleted');
     } catch (e) {
-      print('Error deleting team: $e');
       rethrow;
     }
   }

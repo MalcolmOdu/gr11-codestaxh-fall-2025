@@ -9,7 +9,7 @@ const FIRESTORE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_C
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'stashSnippet') {
-    handleSaveSnippet(request.data)
+    handleSaveSnippet(request)
       .then(() => sendResponse({ success: true }))
       .catch((error) => sendResponse({ success: false, error: error.message }));
     return true; // Keep channel open for async response

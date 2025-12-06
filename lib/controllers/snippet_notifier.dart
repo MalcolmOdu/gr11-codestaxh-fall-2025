@@ -10,7 +10,9 @@ import 'package:hive/hive.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../providers/notification_provider.dart';
 
-//This notifier manages the list of snippets
+/// This notifier listens to the collection of snippets in the firebase database. Files using
+/// this class will be updated immediately upon changes (additions/removals/edits) to the
+/// snippet collection.
 class SnippetStreamNotifier extends StreamNotifier<List<Snippet>> {
 
   final CollectionReference _snippetsCollection = FirebaseFirestore.instance.collection('snippets');
@@ -58,7 +60,7 @@ class SnippetStreamNotifier extends StreamNotifier<List<Snippet>> {
     try {
       await _snippetsCollection.doc(snippet.id).set(snippet.toMap());
     } catch (e) {
-      print('Error syncing to Firestore: $e');
+      return;
     }
   }
 
@@ -72,9 +74,8 @@ class SnippetStreamNotifier extends StreamNotifier<List<Snippet>> {
 
     try {
       await _snippetsCollection.doc(id).delete();
-      print('Snippet $id deleted from Firestore');
     } catch (e) {
-      print('Error deleting from Firestore: $e');
+      return;
     }
   }
 
@@ -89,9 +90,8 @@ class SnippetStreamNotifier extends StreamNotifier<List<Snippet>> {
 
     try {
       await _snippetsCollection.doc(id).update(updatedSnippet.toMap());
-      print('Snippet $id updated in Firestore');
     } catch (e) {
-      print('Error updating Firestore: $e');
+      return;
     }
   }
 

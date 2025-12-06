@@ -14,6 +14,9 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'views/notifications_view.dart';
 import 'views/welcome_screen.dart';
 
+/// This class is responsible for all navigation within the app. It incorporates
+/// firebase_auth to ensure views accessible only by members can only be accessed 
+/// by members.
 class AuthNotifier extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamSubscription<User?>? _subscription;
@@ -36,32 +39,26 @@ final appRouter = GoRouter(
   initialLocation: '/welcome',
 
   refreshListenable: authNotifier,
-  //Redirect
+  //Redirects
   redirect: (context, state) {
     final user = FirebaseAuth.instance.currentUser;
     final isLoginRoute = state.matchedLocation == '/login';
     final isWeb = kIsWeb;
     final homeRoute = isWeb ? '/dashboard' : '/snippets';
 
+    // If user not signed in and route leads beyond signin screens, redirect to singin.
     if (user == null && !isLoginRoute) {
       return '/login';
     } else if (user != null && isLoginRoute) {
       return homeRoute;
     }
 
+    // If user is not using webapp and routes to webapp dashboard, route to snippets view.
     if (!isWeb && state.matchedLocation == '/dashboard') {
       return '/snippets';
     }
 
-    //DO NOT DELETE, FOR TESTING PURPOSES ONLY
-    // if (isWeb && state.matchedLocation == '/snippets') {
-    //   return '/dashboard';
-    // }
-
-    // if (state.matchedLocation == '/'){
-    //   return user != null ? homeRoute : '/login';
-    // }
-
+    // Don't reroute if root directory or welcome screen.
     if (state.matchedLocation == '/' || state.matchedLocation == '/welcome'){
       return null;
     }
@@ -69,6 +66,7 @@ final appRouter = GoRouter(
     return null;
   },
 
+  // All routes
   routes: [
     GoRoute(
       path: '/welcome',
@@ -137,6 +135,7 @@ final appRouter = GoRouter(
     ),
   ],
 
+  // Simple error builder in case page not found.
   errorBuilder: (context, state) => Scaffold(
     appBar: AppBar(title: const Text('Page Not Found')),
     body: Center(
@@ -156,6 +155,7 @@ final appRouter = GoRouter(
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
+            // Dashboard for non-webapp users handled implicitly by rerouting.
             onPressed: () => context.go('/dashboard'),
             icon: const Icon(Icons.home),
             label: const Text('Go to Dashboard'),
@@ -166,6 +166,7 @@ final appRouter = GoRouter(
   )
 );
 
+// Collection of public methods to simplify routing implementation in other files.
 extension NavigationHelpers on BuildContext {
   void goToDashboard() => go('/dashboard');
   void goToSnippets() => go('/snippets');

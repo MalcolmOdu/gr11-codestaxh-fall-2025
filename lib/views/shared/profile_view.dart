@@ -10,6 +10,8 @@ import 'package:codestaxh/app_router.dart';
 import 'package:codestaxh/widgets/snippet_stats.dart';
 import 'package:codestaxh/widgets/about_dialog.dart';
 
+/// This class allows users to view their profile. It includes stats about their
+/// activity on the app, a toggle for dark/light theme, and signout button. 
 class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
 

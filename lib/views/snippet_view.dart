@@ -9,7 +9,11 @@ import '../widgets/notification_bell.dart';
 import 'package:codestaxh/app_router.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-
+/// This is the primary view for mobile users. It shows all snippets,
+/// personal snippets, and team snippets. This includes search functionality
+/// and allows the user to use their mobile device to quickly find a snippet
+/// while coding without having to open separate window for the webapp 
+/// or an online search for the solution.
 class SnippetListView extends ConsumerStatefulWidget {
   const SnippetListView({super.key});
 
@@ -25,6 +29,13 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
     // Override constructor to allow searches from web dashboard to
     // autofill here
     super.initState();
+
+    // sort by recent by default
+    Future.microtask(() {
+      ref.read(snippetSortProvider.notifier).state = SnippetSortType.recent;
+    });
+
+    // Initialize search criteria from previous view if application (dashboard -> snippetview)
     final initialSearch = ref.read(snippetSearchProvider);
     _searchController = TextEditingController(text: initialSearch);
   }
@@ -48,12 +59,14 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
+
+      // Appbar with title, navigation, and search/filter options
       appBar: AppBar(
-        title: const Text("Stashed Snippets!"),
+        title: const Text("Stashed Snippets"),
         toolbarHeight: 200,
         automaticallyImplyLeading: !kIsWeb,
         actions: [
-          // home button for web only
+          // Dashboard button (web users only)
           if (kIsWeb)
             IconButton(
               tooltip: 'Dashboard',
@@ -77,7 +90,8 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // SEARCH BAR
+                
+                // Row containing search bar and search field clear button
                 Row(
                   children: [
                   Expanded(
@@ -123,7 +137,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
 
           const SizedBox(height: 12),
 
-          // TAG FILTER, add filter implementation here
+          // Filter snippets by tag
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -143,7 +157,6 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
                       selectedColor: Colors.blue.shade200,
                       onSelected: (_) {
                         final tags = ref.read(snippetTagFilterProvider.notifier).state;
-                        print(tags);
                         final newSet = Set<String>.from(tags);
 
                         if (selected) {
@@ -163,7 +176,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
 
                 const SizedBox(height: 12),
 
-                // TEAM FILTER
+                // Filter snippets by personal/all/team
                 Row(
                   children: [
                     Expanded(
@@ -214,9 +227,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
       ),
       ),
 
-     //Change this code to stream builder
-     // .orderBy sortKey => make sort button change this
-
+      // Displays all snippets or message if none found.
       body: filteredSnippets.isEmpty
           ? _buildEmptyState(context, filterType)
           : ListView.builder(
@@ -240,7 +251,8 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // TITLE with team badge
+                    
+                    // snippet title with team badge
                     Row(
                       children: [
                         Expanded(
@@ -291,7 +303,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
 
                     const SizedBox(height: 6),
 
-                    // LANGUAGE BADGE
+                    // Shows what language the snippet is written in
                     Chip(
                       label: Text(s.language),
                       backgroundColor: colorScheme
@@ -301,7 +313,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
 
                     const SizedBox(height: 6),
 
-                    // TAGS (first 2)
+                    // Shows up to 2 tags assigned to snippet (rest are viewable in detailed view after tapping)
                     if (s.tags.isNotEmpty)
                       Wrap(
                         spacing: 6,
@@ -317,7 +329,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
 
                     const SizedBox(height: 10),
 
-                    // CODE PREVIEW
+                    // Code preview (i.e. snippet content)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: HighlightView(
@@ -328,10 +340,9 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
                         textStyle: const TextStyle(fontSize: 12),
                       ),
                     ),
-
                     const SizedBox(height: 12),
 
-                    // FOOTER
+                    // Snippet footer, includes upvote options and author
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -372,6 +383,7 @@ class _SnippetListViewState extends ConsumerState<SnippetListView>{
     );
   }
 
+  // Custom widget to display message if no widgets found with given filters
   Widget _buildEmptyState(BuildContext context, SnippetFilterType filterType) {
     String title;
     String message;

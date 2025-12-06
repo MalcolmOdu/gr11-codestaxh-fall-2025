@@ -14,7 +14,9 @@ import 'package:codestaxh/controllers/team_notifier.dart';
 // Display how recent activity is in feed without creating custom DateTime formatting method.
 import 'package:timeago/timeago.dart' as timeago;
 
-
+/// This view is only accessible by webapp users. Acts as a home screen,
+/// providing a recent-sorted view of snippets and options to manage teams,
+/// create snippets, etc.
 class WebDashboardView extends ConsumerWidget {
   const WebDashboardView({super.key});
 

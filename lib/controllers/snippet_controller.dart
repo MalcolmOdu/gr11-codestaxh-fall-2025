@@ -6,6 +6,9 @@ import 'snippet_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/notification_provider.dart';
 
+/// This class is responsible for posting, editing, removing, and upvoting snippets.
+/// This class also triggers a notification to be sent to a user when another user
+/// upvotes their snippet.
 class SnippetController {
   final WidgetRef ref;
 
@@ -74,7 +77,7 @@ class SnippetController {
       }
     }
     catch (e) {
-      print('Error notifying team members of post: $e');
+      return;
     }
   }
 
