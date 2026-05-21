@@ -43,3 +43,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase config — contains API keys. Regenerate with: flutterfire configure
+lib/firebase_options.dart
+android/app/google-services.json
+
+# Firebase CLI cache
+.firebase/
+
+# Cloud Functions env (contains API keys — see functions/.env.example)
+functions/.env
+
+# Build artifacts
+*.apk
